@@ -10,7 +10,7 @@
           <router-link tag="li" to="/manage">管理</router-link>
         </ul>
         <ul class="clear user" v-if="isLogin">
-          <li @click="logout">{{username}}<span></span></li>
+          <li @click="logout">{{user.username||''}}<span></span></li>
         </ul>
         <ul class="clear sign" v-else>
           <router-link class="login" to="/login" tag="li">登录</router-link>
@@ -20,7 +20,10 @@
     </div>
     <div class="container main">
       <div class="container-wrap main-wrap">
-        <router-view/>
+        <router-view
+          :user="user"
+          @login="login"
+        />
       </div>
     </div>
     <div class="container footer">
@@ -33,51 +36,45 @@
 </template>
 
 <script>
-  export default {
-    name: 'App',
-    data() {
-      return {
-        isLogin: false,
-        username: '',
-      }
+export default {
+  name: 'App',
+  data () {
+    return {
+      isLogin: false,
+      user: null
+    }
+  },
+  methods: {
+    logout () {
+      localStorage.setItem('token', '')
+      this.isLogin = false
+      this.user = null
+      this.$router.push('/login') // 前往登录页面
     },
-    methods: {
-      logout(){
-        localStorage.setItem('token','');
-        this.$router.go(0) // 刷新当前页面
-      }
-    },
-    mounted: function () {
-      const token = localStorage.getItem('token');
-      this.$axios.defaults.headers.common['Authorization']= 'Bearer ' + token;
-      if (token) {  //本地存有了token，尝试获取用户信息
-        this.$axios.get('/api/users/user')
-          .then(res => {  // 获取成功了，更新页面
-            this.isLogin = true;
-            this.username = res.data.user.username;
-          })
-          .catch(err => {  //获取失败了，清除这个无效token
-            console.log(err.response.data.message);
-            localStorage.setItem('token','')
-            this.isLogin=false
-            this.username = '';
-          })
-      }else{  // 没有token
-        this.isLogin = false;
-        this.username = '';
-      }
-      /*
-      EventBus.$on('login', user => {  //接收来自其他组件的消息
-        this.isLogin = true;
-        this.username = user.username;
-      })
-      EventBus.$on('logout', () => {
-        this.isLogin = false;
-        this.username = '';
-      })
-      */
+    login (user) {
+      this.isLogin = true
+      this.user = user
+    }
+  },
+  mounted: function () {
+    console.log('App.vue mounted')
+    const token = localStorage.getItem('token')
+    if (token) { // 本地存有了token，尝试获取用户信息
+      this.$axios.get('/api/users/user')
+        .then(res => {
+          this.user = res.data.user
+          this.isLogin = true
+        })
+        .catch(err => { // 获取失败了，清除这个无效token
+          console.log(err.response.data.message)
+          localStorage.setItem('token', '')
+          this.isLogin = false
+          this.user = null
+          this.$router.push('/login')
+        })
     }
   }
+}
 </script>
 
 <style>
@@ -85,16 +82,6 @@
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  li {
-    float: left;
   }
 
   .clear:before {
@@ -127,6 +114,16 @@
   .header .header-wrap {
     height: 100%;
     /*background: aliceblue;*/
+  }
+
+  .header-wrap ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .header-wrap li {
+    float: left;
   }
 
   .header-wrap .cate {

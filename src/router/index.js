@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 // @指src
-import Home from '@/components/Home'
-import Analysis from '@/components/Analysis'
-import Statistics from '@/components/Statistics'
-import Manage from '@/components/Manage'
-import Login from '@/components/Login'
-import Register from '@/components/Register'
+import Home from '../components/Home'
+import Analysis from '../components/Analysis'
+import Statistics from '../components/Statistics'
+import Manage from '../components/Manage'
+import Login from '../components/Login'
+import Register from '../components/Register'
 
 Vue.use(Router)
 
@@ -15,7 +15,7 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: Home
 
     },
     {
@@ -23,7 +23,7 @@ const router = new Router({
       name: 'analysis',
       component: Analysis,
       meta: {
-        requireAuth: true,  // 访问此url需要通过token进行auth认证
+        requireAuth: true // 访问此url需要通过token进行auth认证
       }
     },
     {
@@ -31,7 +31,7 @@ const router = new Router({
       name: 'statistics',
       component: Statistics,
       meta: {
-        requireAuth: true,  // 访问此url需要通过token进行auth认证
+        requireAuth: true // 访问此url需要通过token进行auth认证
       }
     },
     {
@@ -39,7 +39,7 @@ const router = new Router({
       name: 'manage',
       component: Manage,
       meta: {
-        requireAuth: true,  // 访问此url需要通过token进行auth认证
+        requireAuth: true // 访问此url需要通过token进行auth认证
       }
     },
     {
@@ -56,23 +56,23 @@ const router = new Router({
       path: '*',
       name: 'other',
       component: Home
-    },
+    }
   ]
-});
+})
 // 全局导航守卫
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  if (token) {  // 之前有存储过从后端传过来的token
-    if (['login', 'register'].indexOf(to.name) >= 0) {  // 已经登录了耍心机还想去登录
-      next('/analysis')  // 不允许
+  const token = localStorage.getItem('token')
+  if (token) { // 之前有存储过从后端传过来的token
+    if (['login', 'register'].indexOf(to.name) >= 0) { // 已经登录了耍心机还想去登录
+      next('/') // 不允许
     } else {
-      next()   // 想去哪就去哪
+      next() // 想去哪就去哪
     }
-  } else {  // 没有token，到login页面登录取token
-    if (to.meta.requireAuth) {  // 并且要访问的页面需要token验证
-      next('/login')  // 去login登录获取token
+  } else { // 没有token，到login页面登录取token
+    if (to.meta.requireAuth) { // 并且要访问的页面需要token验证
+      next('/login') // 去login登录获取token
     } else {
-      next()  // 并不需要token，直接跳转
+      next() // 并不需要token，直接跳转
     }
   }
 })
