@@ -11,7 +11,7 @@ Vue.config.productionTip = false
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:4000'
 } else {
-  axios.defaults.baseURL = 'http://111.231.200.245:4000'
+  axios.defaults.baseURL = 'http://analytics.server.jessezhu.cn'
 }
 
 // axios拦截器，每次请求前都带上token
