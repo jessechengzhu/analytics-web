@@ -60,8 +60,8 @@ export default {
             this.$router.go(0)
           })
           .catch(err => {
+            console.log(err.response)
             this.message = err.response.data.message
-            // console.log(err.response.data.message)
           })
       }
     },

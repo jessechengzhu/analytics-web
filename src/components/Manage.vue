@@ -5,8 +5,8 @@
       <div class="add-wrap ">
         <div class="title clear"><span>新增网站</span><span @click="hideAddWebsite">X</span></div>
         <div class="input">
-          <label for="domainIpt">网站域名</label>
-          <input type="text" id="domainIpt" placeholder="请输入网站域名" v-model="domainIpt">
+          <label for="hostIpt">网站域名</label>
+          <input type="text" id="hostIpt" placeholder="请输入网站域名" v-model="hostIpt">
           <div class="describe">
             <p>可输入如下4种域名形式：</p>
             <p>1. 主域名（如：www.baidu.com）</p>
@@ -41,8 +41,9 @@
       <h1>网站列表</h1>
       <ul>
         <li v-for="website in websites" :key="website.id">
-          {{website.domain}}
+          {{website.host}}
           <a href="javascript:void(0);" @click="setCode(website.unique_id),showGetCode()">获取代码</a>
+          <a href="javascript:void(0);" @click="checkCode(website.id)">代码检查</a>
         </li>
       </ul>
       <button @click="showAddWebsite">添加一个网站</button>
@@ -57,7 +58,7 @@ export default {
     return {
       darkBgWidth: '0',
       darkBgHeight: '0',
-      domainIpt: '',
+      hostIpt: '',
       indexIpt: '',
       isAddWebsite: false,
       websites: [],
@@ -85,7 +86,7 @@ export default {
     submitAddWebsite () {
       const token = localStorage.getItem('token')
       if (token) {
-        this.$axios.post('/api/websites/website', {domain: this.domainIpt, index_url: this.indexIpt})
+        this.$axios.post('/api/websites/website', {host: this.hostIpt, index_url: this.indexIpt})
           .then(res => {
             this.isAddWebsite = false
             this.websites.push(res.data.website)
@@ -102,7 +103,7 @@ export default {
     setCode (uniqueId) {
       this.code = `&lt;script&gt;
 var _wa= _wa || [ ];
-_wa.push(['_setAccount', ${uniqueId}])
+_wa.push(['_setAccount', '${uniqueId}']);
 (function() {
   var newScript = document.createElement('script');
   newScript.async = true;
@@ -127,6 +128,16 @@ _wa.push(['_setAccount', ${uniqueId}])
       } else {
         this.info = '复制失败，请手动复制'
       }
+    },
+
+    checkCode (id) {
+      this.$axios.get('/api/websites/website/validate/' + id)
+        .then(res => {
+          console.log(res.data.message)
+        })
+        .catch(err => {
+          console.log(err.response.data.message)
+        })
     }
   },
   mounted () {

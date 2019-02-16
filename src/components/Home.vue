@@ -3,7 +3,7 @@
     <div v-if="user">
       <h1>网站列表</h1>
       <ul>
-        <li v-for="website in websites" :key="website.id">{{website.domain}}</li>
+        <li v-for="website in websites" :key="website.id">{{website.host}}</li>
       </ul>
     </div>
     <div v-else>
@@ -15,9 +15,9 @@
 <script>
 export default {
   name: 'Home',
-  props: ['user'],
   data () {
     return {
+      user: null,
       websites: []
     }
   },
@@ -30,10 +30,11 @@ export default {
       this.$axios.get('/api/websites/user')
         .then(res => {
           this.websites = res.data.websites
+          this.user = res.data.user
         })
         .catch(err => { // 获取失败了，清除这个无效token
-          console.log(err.response.data.message)
           localStorage.setItem('token', '')
+          console.log(err.response)
         })
     }
   }

@@ -5,8 +5,8 @@
         <ul class="clear cate">
           <router-link tag="li" to="/"><img src="./assets/logo.png" alt="logo"></router-link>
           <router-link tag="li" to="/">主页</router-link>
-          <router-link tag="li" to="/analysis">分析</router-link>
           <router-link tag="li" to="/statistics">统计</router-link>
+          <router-link tag="li" to="/analysis">分析</router-link>
           <router-link tag="li" to="/manage">管理</router-link>
         </ul>
         <ul class="clear user" v-if="isLogin">
@@ -21,7 +21,6 @@
     <div class="container main">
       <div class="container-wrap main-wrap">
         <router-view
-          :user="user"
           @login="login"
         />
       </div>
@@ -66,11 +65,11 @@ export default {
           this.isLogin = true
         })
         .catch(err => { // 获取失败了，清除这个无效token
-          console.log(err.response.data.message)
           localStorage.setItem('token', '')
           this.isLogin = false
           this.user = null
           this.$router.push('/login')
+          console.log(err.response)
         })
     }
   }

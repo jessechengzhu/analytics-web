@@ -35,8 +35,8 @@ export default {
             this.$router.push('/')// 刷新页面
           })
           .catch(err => {
+            console.log(err.response)
             this.message = err.response.data.message
-            // console.log(err.response.data.message)
           })
       }
     }

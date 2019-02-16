@@ -11,6 +11,8 @@ export default {
     return {
       msg: '这里是统计'
     }
+  },
+  mounted () {
   }
 }
 </script>
