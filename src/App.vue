@@ -55,8 +55,14 @@ export default {
       this.user = user
     }
   },
+  computed: {
+    count () {
+      return this.$store.state.count
+    }
+  },
   mounted: function () {
     console.log('App.vue mounted')
+    console.log(this.count)
     const token = localStorage.getItem('token')
     if (token) { // 本地存有了token，尝试获取用户信息
       this.$axios.get('/api/users/user')
