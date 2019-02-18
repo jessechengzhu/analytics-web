@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import waCode from '../assets/waCode'
 export default {
   name: 'Manage',
   data () {
@@ -86,14 +87,15 @@ export default {
     submitAddWebsite () {
       const token = localStorage.getItem('token')
       if (token) {
-        this.$axios.post('/api/websites/website', {host: this.hostIpt, index_url: this.indexIpt})
+        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
+        this.$store.dispatch('website/addWebsite', submitInfo)
           .then(res => {
             this.isAddWebsite = false
             this.websites.push(res.data.website)
           })
-          .catch(err => { // 获取失败了，清除这个无效token
-            console.log(err.response.data.message)
+          .catch(() => { // 获取失败了，清除这个无效token
             localStorage.setItem('token', '')
+            alert('添加失败')
           })
       } else {
         this.$router.push('/login')
@@ -101,17 +103,7 @@ export default {
     },
 
     setCode (uniqueId) {
-      this.code = `&lt;script&gt;
-var _wa= _wa || [ ];
-_wa.push(['_setAccount', '${uniqueId}']);
-(function() {
-  var newScript = document.createElement('script');
-  newScript.async = true;
-  newScript.src = 'http://analytics.server.jessezhu.cn/resources/javascripts/wa.js';
-  var firstScript = document.getElementsByTagName('script')[0];
-  firstScript.parentNode.insertBefore(newScript, firstScript);
-})();
-&lt;/script&gt;`
+      this.code = waCode(uniqueId)
     },
     showGetCode () {
       this.isGetCode = true
@@ -131,28 +123,16 @@ _wa.push(['_setAccount', '${uniqueId}']);
     },
 
     checkCode (id) {
-      this.$axios.get('/api/websites/website/validate/' + id)
-        .then(res => {
-          console.log(res.data.message)
-        })
-        .catch(err => {
-          console.log(err.response.data.message)
-        })
+      this.$store.dispatch('website/validateSite', id)
     }
   },
   mounted () {
-    console.log('Manage.vue mounted')
     this.initDarkBgWH()
     const token = localStorage.getItem('token')
     if (token) { // 本地存有了token，尝试获取用户所有网站
-      this.$axios.get('/api/websites/user')
-        .then(res => {
-          this.websites = res.data.websites
-        })
-        .catch(err => { // 获取失败了，清除这个无效token
-          console.log(err.response.data.message)
-          localStorage.setItem('token', '')
-        })
+      this.$store.dispatch('website/getWebsites')
+        .then(res => { this.websites = res.data.websites })
+        .catch(() => { localStorage.setItem('token', '') })
     }
   }
 }

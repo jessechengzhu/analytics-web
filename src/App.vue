@@ -20,63 +20,33 @@
     </div>
     <div class="container main">
       <div class="container-wrap main-wrap">
-        <router-view
-          @login="login"
-        />
+        <router-view/>
       </div>
     </div>
     <div class="container footer">
       <div class="container-wrap footer-wrap">
-        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"
-                                                                                   target="_blank">苏ICP备19002725号</a>
+        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/" target="_blank">苏ICP备19002725号</a>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'App',
-  data () {
-    return {
-      isLogin: false,
-      user: null
-    }
-  },
+  // 映射的计算属性的名称与 state 的子节点名称相同，注意是子节点，模块化后子模块里的结点不能使用
+  computed: mapState(['isLogin', 'user']),
   methods: {
     logout () {
-      localStorage.setItem('token', '')
-      this.isLogin = false
-      this.user = null
-      this.$router.push('/login') // 前往登录页面
-    },
-    login (user) {
-      this.isLogin = true
-      this.user = user
-    }
-  },
-  computed: {
-    count () {
-      return this.$store.state.count
+      this.$store.commit('logout')
+      this.$router.push('/login')
     }
   },
   mounted: function () {
-    console.log('App.vue mounted')
-    console.log(this.count)
     const token = localStorage.getItem('token')
     if (token) { // 本地存有了token，尝试获取用户信息
-      this.$axios.get('/api/users/user')
-        .then(res => {
-          this.user = res.data.user
-          this.isLogin = true
-        })
-        .catch(err => { // 获取失败了，清除这个无效token
-          localStorage.setItem('token', '')
-          this.isLogin = false
-          this.user = null
-          this.$router.push('/login')
-          console.log(err.response)
-        })
+      this.$store.dispatch('init')
     }
   }
 }

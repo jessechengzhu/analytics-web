@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 // @指src
-import Home from '../components/Home'
-import Analysis from '../components/Analysis'
-import Statistics from '../components/Statistics'
-import Manage from '../components/Manage'
-import Login from '../components/Login'
-import Register from '../components/Register'
+import Home from '../components/Home.vue'
+import Analysis from '../components/Analysis.vue'
+import Statistics from '../components/Statistics.vue'
+import Manage from '../components/Manage.vue'
+import Login from '../components/Login.vue'
+import Register from '../components/Register.vue'
 
 Vue.use(Router)
 

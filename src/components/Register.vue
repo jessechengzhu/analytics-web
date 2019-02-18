@@ -42,29 +42,6 @@ export default {
     }
   },
   methods: {
-    register () {
-      // 验证各个字段是否格式正确
-      if (this.validateUsr(this.username) && this.validatePsw(this.password) && this.validateEml(this.email)) {
-        this.message = '注册中...'
-        const user = {
-          username: this.username,
-          password: this.password,
-          email: this.email
-        }
-        this.$axios.post('/api/users/register', user)
-          .then(res => {
-            this.message = res.data.message
-            let user = res.data.user
-            this.$emit('login', user) // 向组件App.vue发送消息
-            localStorage.setItem('token', res.data.token) // 存储从后端获得的token
-            this.$router.go(0)
-          })
-          .catch(err => {
-            console.log(err.response)
-            this.message = err.response.data.message
-          })
-      }
-    },
     showToggle () {
       this.toggleFlag = !this.toggleFlag
       if (this.toggleFlag) {
@@ -103,7 +80,8 @@ export default {
       }
     },
     validateEml (val) {
-      const reg = /^[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/ // 邮箱格式
+      // 邮箱格式
+      const reg = new RegExp('^[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]\\.[a-zA-Z][a-zA-Z\\.]*[a-zA-Z]$')
       if (val.length === 0) {
         this.emlMsg = '邮箱不能为空'
         return false
@@ -114,15 +92,47 @@ export default {
         this.emlMsg = '✔'
         return true
       }
+    },
+    register () {
+      let a = this.validateUsr(this.username)
+      let b = this.validatePsw(this.password)
+      let c = this.validateEml(this.email)
+      // 验证各个字段是否格式正确
+      if (a && b && c) {
+        const registerInfo = {
+          username: this.username,
+          password: this.password,
+          email: this.email
+        }
+        this.$store.dispatch('user/validateUsername', {username: this.username})
+          .then(res => {
+            this.usrMsg = '✔'
+            this.message = '注册中...'
+            return this.$store.dispatch('user/register', registerInfo)
+          })
+          .then(res => {
+            this.message = res.data.message
+            localStorage.setItem('token', res.data.token) // 存储从后端获得的token
+            this.$router.push('/')
+          })
+          .catch(err => {
+            this.usrMsg = err.response.data.message || '×'
+          })
+          .catch(err => {
+            this.message = err.response.data.message || ''
+          })
+      }
     }
   },
   watch: { // 字段trim后发生改变了并触发了blur事件（lazy），进行一次验证
-    username: function (val, oldVal) {
+    username (val) {
       if (this.validateUsr(val)) {
-        this.$axios.post('/api/users/username', {username: val})
+        this.$store.dispatch('user/validateUsername', {username: val})
+          .then(() => {
+            this.usrMsg = '✔'
+          })
           .catch(err => {
-            this.usrMsg = err.response.data.message
-            console.log(err.response.data.message)
+            this.usrMsg = err.response.data.message || '×'
           })
       }
     },

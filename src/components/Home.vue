@@ -13,29 +13,27 @@
 </template>
 
 <script>
+// 使用 createNamespacedHelpers 创建基于某个命名空间辅助函数
+import { mapState } from 'vuex'
+
 export default {
   name: 'Home',
   data () {
     return {
-      user: null,
       websites: []
     }
   },
-  methods: {
+  // 在 `Home` 中查找，等同于user: state=>state.Home.user
+  computed: {
+    // 使用对象展开运算符将此对象混入到外部对象中
+    ...mapState(['user'])
   },
   mounted () {
-    console.log('Home.vue mounted')
     const token = localStorage.getItem('token')
     if (token) { // 本地存有了token，尝试获取用户所有网站
-      this.$axios.get('/api/websites/user')
-        .then(res => {
-          this.websites = res.data.websites
-          this.user = res.data.user
-        })
-        .catch(err => { // 获取失败了，清除这个无效token
-          localStorage.setItem('token', '')
-          console.log(err.response)
-        })
+      this.$store.dispatch('website/getWebsites')
+        .then(res => { this.websites = res.data.websites })
+        .catch(() => { localStorage.setItem('token', '') })
     }
   }
 }
