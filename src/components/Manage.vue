@@ -52,157 +52,169 @@
 </template>
 
 <script>
-import waCode from '../assets/waCode'
-export default {
-  name: 'Manage',
-  data () {
-    return {
-      darkBgWidth: '0',
-      darkBgHeight: '0',
-      hostIpt: '',
-      indexIpt: '',
-      isAddWebsite: false,
-      websites: [],
-      isGetCode: false,
-      code: ``,
-      info: ''
-    }
-  },
-  methods: {
-    initDarkBgWH () {
-      this.darkBgWidth = document.body.scrollWidth + 'px'
-      this.darkBgHeight = document.body.scrollHeight + 'px'
-      window.addEventListener('resize', () => {
+  import waCode from '../assets/waCode'
+
+  export default {
+    name: 'Manage',
+    data () {
+      return {
+        darkBgWidth: '0',
+        darkBgHeight: '0',
+        hostIpt: '',
+        indexIpt: '',
+        isAddWebsite: false,
+        websites: [],
+        isGetCode: false,
+        code: ``,
+        info: ''
+      }
+    },
+    methods: {
+      initDarkBgWH () {
         this.darkBgWidth = document.body.scrollWidth + 'px'
         this.darkBgHeight = document.body.scrollHeight + 'px'
-      })
-    },
+        window.addEventListener('resize', () => {
+          this.darkBgWidth = document.body.scrollWidth + 'px'
+          this.darkBgHeight = document.body.scrollHeight + 'px'
+        })
+      },
 
-    showAddWebsite () {
-      this.isAddWebsite = true
+      showAddWebsite () {
+        this.isAddWebsite = true
+      },
+      hideAddWebsite () {
+        this.isAddWebsite = false
+      },
+      submitAddWebsite () {
+        const token = localStorage.getItem('token')
+        if (token) {
+          const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
+          this.$store.dispatch('website/addWebsite', submitInfo)
+            .then(res => {
+              this.isAddWebsite = false
+              this.websites.push(res.data.website)
+            })
+            .catch(() => { // 获取失败了，清除这个无效token
+              localStorage.setItem('token', '')
+              alert('添加失败')
+            })
+        } else {
+          this.$router.push('/login')
+        }
+      },
+
+      setCode (uniqueId) {
+        this.code = waCode(uniqueId)
+      },
+      showGetCode () {
+        this.isGetCode = true
+      },
+      hideGetCode () {
+        this.isGetCode = false
+        this.info = ''
+      },
+      copyGetCode () {
+        const textarea = document.querySelector('#code')
+        textarea.select()
+        if (document.execCommand('copy')) {
+          this.info = '已复制到剪贴板'
+        } else {
+          this.info = '复制失败，请手动复制'
+        }
+      },
+
+      checkCode (id) {
+        this.$store.dispatch('website/validateSite', id)
+      }
     },
-    hideAddWebsite () {
-      this.isAddWebsite = false
-    },
-    submitAddWebsite () {
+    mounted () {
+      this.initDarkBgWH()
       const token = localStorage.getItem('token')
-      if (token) {
-        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
-        this.$store.dispatch('website/addWebsite', submitInfo)
-          .then(res => {
-            this.isAddWebsite = false
-            this.websites.push(res.data.website)
-          })
-          .catch(() => { // 获取失败了，清除这个无效token
-            localStorage.setItem('token', '')
-            alert('添加失败')
-          })
-      } else {
-        this.$router.push('/login')
+      if (token) { // 本地存有了token，尝试获取用户所有网站
+        this.$store.dispatch('website/getWebsitesOverview')
+          .then(res => { this.websites = res.data.websites })
+          .catch(() => { localStorage.setItem('token', '') })
       }
-    },
-
-    setCode (uniqueId) {
-      this.code = waCode(uniqueId)
-    },
-    showGetCode () {
-      this.isGetCode = true
-    },
-    hideGetCode () {
-      this.isGetCode = false
-      this.info = ''
-    },
-    copyGetCode () {
-      const textarea = document.querySelector('#code')
-      textarea.select()
-      if (document.execCommand('copy')) {
-        this.info = '已复制到剪贴板'
-      } else {
-        this.info = '复制失败，请手动复制'
-      }
-    },
-
-    checkCode (id) {
-      this.$store.dispatch('website/validateSite', id)
-    }
-  },
-  mounted () {
-    this.initDarkBgWH()
-    const token = localStorage.getItem('token')
-    if (token) { // 本地存有了token，尝试获取用户所有网站
-      this.$store.dispatch('website/getWebsites')
-        .then(res => { this.websites = res.data.websites })
-        .catch(() => { localStorage.setItem('token', '') })
     }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .dark-bg{
+  .dark-bg {
     position: absolute;
     left: 0;
     top: 0;
-    background: rgba(0,0,0,.5);
+    background: rgba(0, 0, 0, .5);
   }
-  .add,.code{
+
+  .add, .code {
     position: fixed;
     width: 500px;
     background: #ffffff;
     overflow: hidden;
     top: 50%;
     left: 50%;
-    border-radius:5px;
-    -webkit-transform: translate(-50%,-50%);
-    -moz-transform: translate(-50%,-50%);
-    -ms-transform: translate(-50%,-50%);
-    -o-transform: translate(-50%,-50%);
-    transform: translate(-50%,-50%);
+    border-radius: 5px;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
   }
-  .add .add-wrap,.code .code-wrap{
+
+  .add .add-wrap, .code .code-wrap {
     position: relative;
   }
-  .button{
+
+  .button {
     padding: 10px;
     text-align: right;
   }
-  .button button{
+
+  .button button {
     width: 60px;
     height: 30px;
     margin-right: 10px;
     font-size: 14px;
   }
-  .button .sure{
+
+  .button .sure {
     background: #4f97e7;
     border: 1px solid #3085e3;
     color: #fff;
   }
-  .button .sure:hover{
+
+  .button .sure:hover {
     background: #82c0e7;
   }
-  .button .cancel{
+
+  .button .cancel {
     background: #fff;
     border: 1px solid #aaa;
     color: #333;
   }
-  .button .cancel:hover{
+
+  .button .cancel:hover {
     background: #bbb;
   }
-  .button .copy{
+
+  .button .copy {
     background: #4f97e7;
     border: 1px solid #3085e3;
     color: #fff;
   }
-  .button .copy:hover{
+
+  .button .copy:hover {
     background: #82c0e7;
   }
 
-  .add-wrap .title{
+  .add-wrap .title {
     position: relative;
     background: #ccc;
   }
-  .add-wrap .title span:first-child{
+
+  .add-wrap .title span:first-child {
     line-height: 30px;
     font-size: 16px;
     color: #333;
@@ -210,26 +222,31 @@ export default {
     text-align: center;
     float: left;
   }
-  .add-wrap .title span:last-child{
+
+  .add-wrap .title span:last-child {
     position: absolute;
     width: 30px;
     height: 30px;
     background: red;
     right: 0;
   }
-  .add-wrap .input{
+
+  .add-wrap .input {
     padding: 15px;
   }
-  .add-wrap .input .describe{
+
+  .add-wrap .input .describe {
     padding-left: 90px;
     padding-top: 10px;
   }
-  .add-wrap .input .describe p{
+
+  .add-wrap .input .describe p {
     margin: 0;
     font-size: 15px;
     color: #666;
   }
-  .add-wrap  label{
+
+  .add-wrap label {
     display: inline-block;
     width: 80px;
     height: 20px;
@@ -237,7 +254,8 @@ export default {
     font-size: 16px;
     color: #333;
   }
-  .add-wrap  input{
+
+  .add-wrap input {
     outline: none;
     padding: 1px 15px;
     border: 2px solid #8284ff;
@@ -246,20 +264,23 @@ export default {
     line-height: 20px;
     font-size: 15px;
   }
-  .add-wrap  input:focus{
+
+  .add-wrap input:focus {
     border: 2px solid #ff736b;
   }
 
-  .code-wrap{
+  .code-wrap {
     background: #f8f8f8;
   }
-  .code-wrap .code-content{
+
+  .code-wrap .code-content {
     width: 470px;
     height: 200px;
     padding: 15px;
     color: #333;
   }
-  .code-wrap .code-content textarea{
+
+  .code-wrap .code-content textarea {
     outline: none;
     border: none;
     width: 100%;
@@ -268,7 +289,8 @@ export default {
     line-height: 24px;
     resize: none;
   }
-  .code-wrap .info{
+
+  .code-wrap .info {
     position: absolute;
     bottom: 0;
     padding: 10px 15px;

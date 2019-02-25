@@ -3,9 +3,9 @@ const state = {}
 const getters = {}
 const mutations = {}
 const actions = {
-  getWebsites ({commit, rootState}) {
+  getWebsitesOverview ({commit, rootState}) {
     return new Promise((resolve, reject) => {
-      rootState.$axios.get('/api/websites/user')
+      rootState.$axios.get('/api/websites/overview/user')
         .then(res => {
           commit('setUser', res.data, {root: true})
           resolve(res)
@@ -30,6 +30,18 @@ const actions = {
   addWebsite ({rootState}, addInfo) {
     return new Promise((resolve, reject) => {
       rootState.$axios.post('/api/websites/website', addInfo)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+          console.log(err.response.data.message)
+        })
+    })
+  },
+  getPVToday ({rootState}, id) {
+    return new Promise((resolve, reject) => {
+      rootState.$axios.get('/api/websites/website/pv-today/' + id)
         .then(res => {
           resolve(res)
         })
