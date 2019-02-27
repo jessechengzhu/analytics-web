@@ -30,7 +30,7 @@
         <div class="code-content">
           <textarea id="code" v-html="code"></textarea>
         </div>
-        <div class="info">{{info}}</div>
+        <div class="info">{{copyRes}}</div>
         <div class="button">
           <button class="copy" @click="copyGetCode">复制</button>
           <button class="cancel" @click="hideGetCode">关闭</button>
@@ -44,6 +44,7 @@
           {{website.host}}
           <a href="javascript:void(0);" @click="setCode(website.unique_id),showGetCode()">获取代码</a>
           <a href="javascript:void(0);" @click="checkCode(website.id)">代码检查</a>
+          <span>{{ checkRes }}</span>
         </li>
       </ul>
       <button @click="showAddWebsite">添加一个网站</button>
@@ -66,7 +67,8 @@
         websites: [],
         isGetCode: false,
         code: ``,
-        info: ''
+        copyRes: '',
+        checkRes: ''
       }
     },
     methods: {
@@ -117,14 +119,17 @@
         const textarea = document.querySelector('#code')
         textarea.select()
         if (document.execCommand('copy')) {
-          this.info = '已复制到剪贴板'
+          this.copyRes = '已复制到剪贴板'
         } else {
-          this.info = '复制失败，请手动复制'
+          this.copyRes = '复制失败，请手动复制'
         }
       },
 
       checkCode (id) {
         this.$store.dispatch('website/validateSite', id)
+          .then(res=>{
+            this.checkRes = res.data.message
+          })
       }
     },
     mounted () {

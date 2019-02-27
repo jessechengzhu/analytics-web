@@ -20,9 +20,11 @@ const actions = {
     return new Promise((resolve, reject) => {
       rootState.$axios.get('/api/websites/website/validate/' + id)
         .then(res => {
-          console.log(res.data.message)
+          resolve(res)
+          // console.log(res.data.message)
         })
         .catch(err => {
+          reject(err)
           console.log(err.response.data.message)
         })
     })
