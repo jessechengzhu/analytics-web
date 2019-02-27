@@ -43,8 +43,7 @@
         <li v-for="website in websites" :key="website.id">
           {{website.host}}
           <a href="javascript:void(0);" @click="setCode(website.unique_id),showGetCode()">获取代码</a>
-          <a href="javascript:void(0);" @click="checkCode(website.id)">代码检查</a>
-          <span>{{ checkRes }}</span>
+          <a href="javascript:void(0);" @click="checkCode(website)">代码检查</a>
         </li>
       </ul>
       <button @click="showAddWebsite">添加一个网站</button>
@@ -68,7 +67,7 @@
         isGetCode: false,
         code: ``,
         copyRes: '',
-        checkRes: ''
+        checkRes: []
       }
     },
     methods: {
@@ -125,10 +124,10 @@
         }
       },
 
-      checkCode (id) {
-        this.$store.dispatch('website/validateSite', id)
+      checkCode (website) {
+        this.$store.dispatch('website/validateSite', website.id)
           .then(res=>{
-            this.checkRes = res.data.message
+            alert(res.data.message)
           })
       }
     },

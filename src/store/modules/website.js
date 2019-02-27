@@ -3,14 +3,25 @@ const state = {}
 const getters = {}
 const mutations = {}
 const actions = {
-  getWebsitesOverview ({commit, rootState}) {
+  getWebsites ({rootState}) {
+    return new Promise((resolve, reject) => {
+      rootState.$axios.get('/api/websites/user')
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          console.log(err.response || '')
+          reject(err)
+        })
+    })
+  },
+  getWebsitesOverview ({rootState}) {
     return new Promise((resolve, reject) => {
       rootState.$axios.get('/api/websites/overview/user')
         .then(res => {
-          commit('setUser', res.data, {root: true})
           resolve(res)
         })
-        .catch(err => { // 获取失败了，清除这个无效token
+        .catch(err => {
           console.log(err.response || '')
           reject(err)
         })
@@ -41,9 +52,9 @@ const actions = {
         })
     })
   },
-  getPVToday ({rootState}, id) {
+  getWebsite ({rootState}, id) {
     return new Promise((resolve, reject) => {
-      rootState.$axios.get('/api/websites/website/pv-today/' + id)
+      rootState.$axios.get('/api/websites/website?siteId=' + id)
         .then(res => {
           resolve(res)
         })
