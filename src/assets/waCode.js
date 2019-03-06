@@ -1,7 +1,7 @@
-export default function (uniqueId) {
+export default function (trackId) {
   return `&lt;script&gt;
 var _wa= _wa || [ ];
-_wa.push(['_setAccount', '${uniqueId}']);
+_wa.push(['track', '${trackId}']);
 (function() {
   var newScript = document.createElement('script');
   newScript.async = true;

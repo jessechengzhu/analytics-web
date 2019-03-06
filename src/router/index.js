@@ -33,7 +33,17 @@ const router = new Router({
       component: Statistics,
       meta: {
         requireAuth: true // 访问此url需要通过token进行auth认证
-      }
+      },
+      children: [
+        {
+          // /statistics/id
+          path: ':id',
+          component: Statistics,
+          meta: {
+            requireAuth: true // 访问此url需要通过token进行auth认证
+          }
+        }
+      ]
     },
     {
       path: '/manage',

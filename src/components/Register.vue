@@ -104,11 +104,11 @@ export default {
           password: this.password,
           email: this.email
         }
-        this.$store.dispatch('user/validateUsername', {username: this.username})
+        this.$store.dispatch('validateUsername', {username: this.username})
           .then(res => {
             this.usrMsg = '✔'
             this.message = '注册中...'
-            return this.$store.dispatch('user/register', registerInfo)
+            return this.$store.dispatch('register', registerInfo)
           })
           .then(res => {
             this.message = res.data.message
@@ -127,7 +127,7 @@ export default {
   watch: { // 字段trim后发生改变了并触发了blur事件（lazy），进行一次验证
     username (val) {
       if (this.validateUsr(val)) {
-        this.$store.dispatch('user/validateUsername', {username: val})
+        this.$store.dispatch('validateUsername', {username: val})
           .then(() => {
             this.usrMsg = '✔'
           })

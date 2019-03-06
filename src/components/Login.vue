@@ -29,7 +29,7 @@ export default {
           username: this.username,
           password: this.password
         }
-        this.$store.dispatch('user/login', loginInfo)
+        this.$store.dispatch('login', loginInfo)
           .then(res => {
             this.message = res.data.message
             this.$router.push('/')

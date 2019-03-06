@@ -42,7 +42,7 @@
       <ul>
         <li v-for="website in websites" :key="website.id">
           {{website.host}}
-          <a href="javascript:void(0);" @click="setCode(website.unique_id),showGetCode()">获取代码</a>
+          <a href="javascript:void(0);" @click="setCode(website.track_id),showGetCode()">获取代码</a>
           <a href="javascript:void(0);" @click="checkCode(website)">代码检查</a>
         </li>
       </ul>
@@ -90,7 +90,7 @@
         const token = localStorage.getItem('token')
         if (token) {
           const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
-          this.$store.dispatch('website/addWebsite', submitInfo)
+          this.$store.dispatch('addWebsite', submitInfo)
             .then(res => {
               this.isAddWebsite = false
               this.websites.push(res.data.website)
@@ -104,8 +104,8 @@
         }
       },
 
-      setCode (uniqueId) {
-        this.code = waCode(uniqueId)
+      setCode (trackId) {
+        this.code = waCode(trackId)
       },
       showGetCode () {
         this.isGetCode = true
@@ -125,7 +125,7 @@
       },
 
       checkCode (website) {
-        this.$store.dispatch('website/validateSite', website.id)
+        this.$store.dispatch('validateSite', website.id)
           .then(res=>{
             alert(res.data.message)
           })
@@ -135,7 +135,7 @@
       this.initDarkBgWH()
       const token = localStorage.getItem('token')
       if (token) { // 本地存有了token，尝试获取用户所有网站
-        this.$store.dispatch('website/getWebsitesOverview')
+        this.$store.dispatch('getWebsitesOverview')
           .then(res => { this.websites = res.data.websites })
           .catch(() => { localStorage.setItem('token', '') })
       }

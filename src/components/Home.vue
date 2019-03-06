@@ -43,13 +43,13 @@
     },
     methods: {
       toStatistics (id) {
-        this.$router.push('/statistics?siteId='+id)
+        this.$router.push('/statistics/'+id)
       }
     },
     mounted () {
       const token = localStorage.getItem('token')
       if (token) { // 本地存有了token，尝试获取用户所有网站
-        this.$store.dispatch('website/getWebsitesOverview')
+        this.$store.dispatch('getWebsitesOverview')
           .then(res => { this.websites = res.data.websites })
           .catch(() => { localStorage.setItem('token', '') })
       }

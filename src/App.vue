@@ -46,13 +46,17 @@ export default {
   mounted: function () {
     const token = localStorage.getItem('token')
     if (token) { // 本地存有了token，尝试获取用户信息
-      this.$store.dispatch('init')
+      this.$store.dispatch('getUser')
     }
   }
 }
 </script>
 
 <style>
+  *{
+    margin: 0;
+    padding: 0;
+  }
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
