@@ -73,7 +73,7 @@ const router = new Router({
 // 全局导航守卫
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (token) { // 之前有存储过从后端传过来的token
+  if (token) {
     if (['login', 'register'].indexOf(to.name) >= 0) { // 已经登录了耍心机还想去登录
       next('/') // 不允许
     } else {

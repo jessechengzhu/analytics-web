@@ -3,7 +3,7 @@ export default {
     state.user = user
     state.isLogin = true
   },
-  logout (state) {
+  clearUser (state) {
     state.user = null
     state.isLogin = false
     localStorage.setItem('token', '')

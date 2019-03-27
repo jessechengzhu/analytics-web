@@ -28,7 +28,7 @@
     <div v-if="isGetCode" class="code">
       <div class="code-wrap ">
         <div class="code-content">
-          <textarea id="code" v-html="code"></textarea>
+          <textarea id="code" v-html="code" readonly></textarea>
         </div>
         <div class="info">{{copyRes}}</div>
         <div class="button">
@@ -87,21 +87,15 @@
         this.isAddWebsite = false
       },
       submitAddWebsite () {
-        const token = localStorage.getItem('token')
-        if (token) {
-          const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
-          this.$store.dispatch('addWebsite', submitInfo)
-            .then(res => {
-              this.isAddWebsite = false
-              this.websites.push(res.data.website)
-            })
-            .catch(() => { // 获取失败了，清除这个无效token
-              localStorage.setItem('token', '')
-              alert('添加失败')
-            })
-        } else {
-          this.$router.push('/login')
-        }
+        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
+        this.$store.dispatch('addWebsite', submitInfo)
+          .then(res => {
+            this.isAddWebsite = false
+            this.websites.push(res.data.website)
+          })
+          .catch(() => {
+            alert('添加失败')
+          })
       },
 
       setCode (trackId) {
@@ -112,7 +106,7 @@
       },
       hideGetCode () {
         this.isGetCode = false
-        this.info = ''
+        this.copyRes = ''
       },
       copyGetCode () {
         const textarea = document.querySelector('#code')
@@ -129,16 +123,17 @@
           .then(res=>{
             alert(res.data.message)
           })
+          .catch(err=> alert('未检测到代码'))
+      },
+
+      getWebsites(){
+        this.$store.dispatch('getWebsites')
+          .then(res => { this.websites = res.data.websites })
       }
     },
     mounted () {
       this.initDarkBgWH()
-      const token = localStorage.getItem('token')
-      if (token) { // 本地存有了token，尝试获取用户所有网站
-        this.$store.dispatch('getWebsitesOverview')
-          .then(res => { this.websites = res.data.websites })
-          .catch(() => { localStorage.setItem('token', '') })
-      }
+      this.getWebsites()
     }
   }
 </script>
@@ -154,7 +149,7 @@
 
   .add, .code {
     position: fixed;
-    width: 500px;
+    width: 600px;
     background: #ffffff;
     overflow: hidden;
     top: 50%;
@@ -278,7 +273,7 @@
   }
 
   .code-wrap .code-content {
-    width: 470px;
+    width: 570px;
     height: 200px;
     padding: 15px;
     color: #333;
@@ -290,7 +285,9 @@
     width: 100%;
     height: 100%;
     font-size: 13px;
-    line-height: 24px;
+    font-weight: 500;
+    line-height: 20px;
+    background: #f8f8f8;
     resize: none;
   }
 

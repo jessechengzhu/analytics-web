@@ -11,10 +11,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="website in websites" :key="website.id" @click="toStatistics(website.id)">
+        <tr v-for="website in overview" :key="website.id" @click="toStatistics(website.id)">
           <td>{{ website.host }}</td>
-          <td>{{ website.pvNum }}</td>
-          <td>{{ website.uvNum }}</td>
+          <td>{{ website.pvToday }}</td>
+          <td>{{ website.uvToday }}</td>
         </tr>
         </tbody>
       </table>
@@ -33,26 +33,24 @@
     name: 'Home',
     data () {
       return {
-        websites: []
+        overview: []
       }
     },
-    // 在 `Home` 中查找，等同于user: state=>state.Home.user
     computed: {
       // 使用对象展开运算符将此对象混入到外部对象中
       ...mapState(['user'])
     },
     methods: {
+      getOverview(){
+        this.$store.dispatch('getOverview')
+          .then(res => { this.overview = res.data.overview })
+      },
       toStatistics (id) {
         this.$router.push('/statistics/'+id)
       }
     },
     mounted () {
-      const token = localStorage.getItem('token')
-      if (token) { // 本地存有了token，尝试获取用户所有网站
-        this.$store.dispatch('getWebsitesOverview')
-          .then(res => { this.websites = res.data.websites })
-          .catch(() => { localStorage.setItem('token', '') })
-      }
+      this.getOverview()
     }
   }
 </script>

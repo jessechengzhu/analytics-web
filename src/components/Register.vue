@@ -104,7 +104,7 @@ export default {
           password: this.password,
           email: this.email
         }
-        this.$store.dispatch('validateUsername', {username: this.username})
+        this.$store.dispatch('validateUsername', this.username)
           .then(res => {
             this.usrMsg = '✔'
             this.message = '注册中...'
@@ -112,7 +112,6 @@ export default {
           })
           .then(res => {
             this.message = res.data.message
-            localStorage.setItem('token', res.data.token) // 存储从后端获得的token
             this.$router.push('/')
           })
           .catch(err => {
@@ -127,7 +126,7 @@ export default {
   watch: { // 字段trim后发生改变了并触发了blur事件（lazy），进行一次验证
     username (val) {
       if (this.validateUsr(val)) {
-        this.$store.dispatch('validateUsername', {username: val})
+        this.$store.dispatch('validateUsername', val)
           .then(() => {
             this.usrMsg = '✔'
           })

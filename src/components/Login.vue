@@ -3,7 +3,7 @@
     <h1>登录</h1>
     <label>用户名<input v-model="username"/></label><br>
     <label>密码<input v-model="password" type="password"/></label><br>
-    <button @click="login({username,password})">登录</button>
+    <button @click="login()">登录</button>
     <p>{{message}}</p>
   </div>
 </template>
@@ -35,7 +35,7 @@ export default {
             this.$router.push('/')
           })
           .catch(err => {
-            this.message = err.response.data
+            this.message = err.response.data.message
           })
       }
     }
