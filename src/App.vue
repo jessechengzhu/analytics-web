@@ -4,7 +4,8 @@
       <div class="nav nav-left">
         <div class="logo"></div>
         <div class="select" @click="toggleSelect">
-          {{selectInfo}}&nbsp;<i class="fa fa-lg" :class="{'fa-caret-right': !showSelect, 'fa-caret-left': showSelect}"></i>
+          {{selectInfo}}&nbsp;<i class="fa fa-lg"
+                                 :class="{'fa-caret-right': !showSelect, 'fa-caret-left': showSelect}"></i>
         </div>
         <div class="select-content" v-show="showSelect">
           <ul>
@@ -15,7 +16,8 @@
       <div class="nav nav-right">
         <div class="user" v-if="isLogin&&user">
           <div class="user-avatar" @click="toggleUserOperation">
-            <i class="fa fa-user-circle-o"></i>&nbsp;{{user.username}}&nbsp;<i class="fa fa-lg" :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
+            <i class="fa fa-user-circle-o"></i>&nbsp;{{user.username}}&nbsp;<i class="fa fa-lg"
+                                                                               :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
           </div>
           <div class="user-operation" v-show="showUserOperation">
             <a @click="logout">其他操作</a>
@@ -31,30 +33,32 @@
     <div class="main">
       <div class="side">
         <div class="side-bar list-group">
-          <router-link to="/" class="list-group-item" :class="{'choose': chooseH}" @click.native="choose(0)">
+          <router-link to="/" class="list-group-item" :class="{'choose': chooseH}">
             <i class="fa fa-home fa-fw" style="color: #4f97e7"></i>&nbsp;主页
           </router-link>
-          <router-link to="/statistics" class="list-group-item" :class="{'choose': chooseS}" @click.native="choose(1)">
+          <router-link to="/statistics" class="list-group-item" :class="{'choose': chooseS}">
             <i class="fa fa-bar-chart fa-fw" style="color: #e78271"></i>&nbsp;统计
           </router-link>
-          <router-link to="/analysis" class="list-group-item" :class="{'choose': chooseA}" @click.native="choose(2)">
+          <router-link to="/analysis" class="list-group-item" :class="{'choose': chooseA}">
             <i class="fa fa-line-chart fa-fw" style="color: #e7cd5a"></i>&nbsp;分析
           </router-link>
-          <router-link to="/manage" class="list-group-item" :class="{'choose': chooseM}" @click.native="choose(3)">
+          <router-link to="/manage" class="list-group-item" :class="{'choose': chooseM}">
             <i class="fa fa-cog fa-fw" style="color: #e76cb2"></i>&nbsp;管理
           </router-link>
         </div>
       </div>
       <div class="main-wrap">
-        <router-view/>
+        <router-view
+          @routerTo="routerTo"
+        />
       </div>
     </div>
-<!--    <div class=" footer">-->
-<!--      <div class="footer-wrap">-->
-<!--        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"-->
-<!--                                                                                   target="_blank">苏ICP备19002725号</a>-->
-<!--      </div>-->
-<!--    </div>-->
+    <!--    <div class=" footer">-->
+    <!--      <div class="footer-wrap">-->
+    <!--        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"-->
+    <!--                                                                                   target="_blank">苏ICP备19002725号</a>-->
+    <!--      </div>-->
+    <!--    </div>-->
 
   </div>
 </template>
@@ -75,77 +79,118 @@
         chooseM: false,
       }
     },
-    computed: mapState(['isLogin', 'user', 'websites', 'currentSiteId']),
+    computed: mapState(['isLogin', 'user', 'websites', 'currentWebsite']),
     methods: {
-      /* 隐藏显示选择内容 */
-      toggleSelect () {
-        this.showSelect = !this.showSelect
-      },
-      toggleUserOperation () {
-        this.showUserOperation = !this.showUserOperation
-      },
-      choose (num) {
-        switch (num) {
-          case 0:
-            this.selectInfo = '全部网站数据'
-            this.chooseH = true
-            this.chooseS = false
-            this.chooseA = false
-            this.chooseM = false
-            break
-          case 1:
-            this.selectInfo = '当前选择：'+ this.$store.state.currentWebsite.host
-            this.chooseH = false
-            this.chooseS = true
-            this.chooseA = false
-            this.chooseM = false
-            break
-          case 2:
-            this.selectInfo = '当前选择：'+ this.$store.state.currentWebsite.host
-            this.chooseH = false
-            this.chooseS = false
-            this.chooseA = true
-            this.chooseM = false
-            break
-          case 3:
-            this.selectInfo = '全部网站数据'
-            this.chooseH = false
-            this.chooseS = false
-            this.chooseA = false
-            this.chooseM = true
-            break
-          default:
-            this.selectInfo = '全部网站数据'
-            this.chooseH = true
-            this.chooseS = false
-            this.chooseA = false
-            this.chooseM = false
-        }
-      },
       logout () {
+        this.selectInfo = '全部网站数据'
         this.$store.commit('clearUser')
-        this.$router.push('/login')
+        this.$router.replace('/login')
+        sessionStorage.removeItem('website')
       },
       getUser () {
         this.$store.dispatch('getUser')
       },
       getWebsites () {
         this.$store.dispatch('getWebsites')
+          .then(() => {this.loadSessionStorage()})
+      },
+      loadSessionStorage () {
+        let currentWebsite = JSON.parse(sessionStorage.getItem('website'))
+        if (currentWebsite) {
+          this.$store.commit('setCurrentWebsite', currentWebsite)
+        } else if (this.websites.length !== 0) {
+          this.$store.commit('setCurrentWebsite', this.websites[0])
+        }
+        sessionStorage.removeItem('website')
+      },
+      toggleSelect () {
+        this.showSelect = !this.showSelect
+      },
+      toggleUserOperation () {
+        this.showUserOperation = !this.showUserOperation
+      },
+      routerTo (num) {
+        switch (num) {
+          case -1:
+            this.chooseH = false
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = false
+            break
+          case 0:
+            this.chooseH = true
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = false
+            break
+          case 1:
+            this.chooseH = false
+            this.chooseS = true
+            this.chooseA = false
+            this.chooseM = false
+            break
+          case 2:
+            this.chooseH = false
+            this.chooseS = false
+            this.chooseA = true
+            this.chooseM = false
+            break
+          case 3:
+            this.chooseH = false
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = true
+            break
+          default:
+            this.chooseH = true
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = false
+        }
       },
       selectWebsite (website) {
-        if(this.chooseH || this.chooseM){
-          this.choose(1)
+        if (this.chooseH || this.chooseM) {
           this.$router.push('/statistics')
         }
         this.showSelect = false
-        this.selectInfo = '当前选择：'+ website.host
+        this.selectInfo = '当前选择：' + website.host
         this.$store.commit('setCurrentWebsite', website)
       }
     },
+    watch: {
+      chooseH (choose) {
+        if (choose) {
+          this.selectInfo = '全部网站数据'
+        }
+      },
+      chooseS (choose) {
+        if (choose && this.currentWebsite) {
+          this.selectInfo = '当前选择：' + this.currentWebsite.host
+        }
+      },
+      chooseA (choose) {
+        if (choose && this.currentWebsite) {
+          this.selectInfo = '当前选择：' + this.currentWebsite.host
+        }
+      },
+      chooseM (choose) {
+        if (choose) {
+          this.selectInfo = '全部网站数据'
+        }
+      },
+      /* 用于监听刷新页面后vuex数据丢失问题 */
+      currentWebsite (website) {
+        if (this.chooseS || this.chooseA) {
+          this.selectInfo = '当前选择：' + website.host
+        }
+      }
+    },
     mounted () {
-      console.log('app')
       this.getUser()
       this.getWebsites()
+      window.onbeforeunload = () => {
+        sessionStorage.setItem('website', JSON.stringify(this.currentWebsite))
+      }
     }
   }
 </script>
@@ -166,7 +211,7 @@
 
   div.header {
     box-sizing: content-box;
-    box-shadow: 0 1px  1px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
     width: 100%;
@@ -319,6 +364,7 @@
     position: fixed;
     box-sizing: border-box;
     box-shadow: 1px 0 rgba(0, 0, 0, 0.1);
+    height: 100%;
   }
 
   div.main .side-bar {

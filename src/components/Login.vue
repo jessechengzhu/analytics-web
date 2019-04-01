@@ -33,6 +33,11 @@ export default {
           .then(res => {
             this.message = res.message
             this.$router.push('/')
+            this.$store.dispatch('getWebsites')
+              .then(res=>{
+                this.$store.commit('setCurrentWebsite', res.websites[0])
+              })
+            this.$emit('routerTo',0)
           })
           .catch(err => {
             this.message = err.message
@@ -41,6 +46,7 @@ export default {
     }
   },
   mounted () {
+    this.$emit('routerTo',-1)
   }
 }
 </script>

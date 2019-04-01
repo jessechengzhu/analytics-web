@@ -47,7 +47,7 @@
       }
     },
     mounted () {
-      this.$emit('showSelect')
+      this.$emit('routerTo',2)
       this.getLimitRecords(1)
     }
 

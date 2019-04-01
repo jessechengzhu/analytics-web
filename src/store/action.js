@@ -46,7 +46,7 @@ export default {
         })
         .catch(() => { // 获取失败了，清除这个无效token
           commit('clearUser')
-          localStorage.setItem('token', '')
+          localStorage.removeItem('token')
         })
     }
   },
@@ -85,21 +85,20 @@ export default {
   },
   /* 网站 */
   getWebsites ({state, commit}) {
-    if (localStorage.getItem('token')) {
-      return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+      if (localStorage.getItem('token')) {
         axios.get('/api/websites/user')
           .then(res => {
             commit('setWebsites', res.websites)
-            if (!state.currentWebsite && res.websites.length !== 0) {
-              commit('setCurrentWebsite', res.websites[0])
-            }
             resolve(res)
           })
           .catch(err => {
             reject(err)
           })
-      })
-    }
+      } else {
+        resolve([])
+      }
+    })
   },
   validateSite (context, id) {
     return new Promise((resolve, reject) => {

@@ -63,7 +63,7 @@
       }
     },
     mounted () {
-      console.log('statistics')
+      this.$emit('routerTo',1)
       this.loadPage()
     }
   }

@@ -113,6 +113,11 @@ export default {
           .then(res => {
             this.message = res.message
             this.$router.push('/')
+            this.$store.dispatch('getWebsites')
+              .then(res=>{
+                this.$store.commit('setCurrentWebsite', res.websites[0])
+              })
+            this.$emit('routerToHome')
           })
           .catch(err => {
             this.usrMsg = err.message || '×'
@@ -141,6 +146,9 @@ export default {
     email (val) {
       this.validateEml(val)
     }
+  },
+  mounted () {
+    this.$emit('routerTo',-1)
   }
 }
 </script>

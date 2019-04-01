@@ -53,6 +53,7 @@
 
 <script>
   import waCode from '../assets/waCode'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'Manage',
@@ -63,13 +64,13 @@
         hostIpt: '',
         indexIpt: '',
         isAddWebsite: false,
-        websites: [],
         isGetCode: false,
         code: ``,
         copyRes: '',
         checkRes: []
       }
     },
+    computed: mapState(['websites']),
     methods: {
       initDarkBgWH () {
         this.darkBgWidth = document.body.scrollWidth + 'px'
@@ -91,7 +92,12 @@
         this.$store.dispatch('addWebsite', submitInfo)
           .then(res => {
             this.isAddWebsite = false
-            this.websites.push(res.website)
+            const websites = this.websites
+            websites.push(res.website)
+            this.$store.commit('setWebsites', websites)
+            if (websites.length === 1){
+              this.$store.commit('setCurrentWebsite',websites[0])
+            }
             this.hostIpt = ''
             this.indexIpt = ''
           })
@@ -126,17 +132,11 @@
             alert(res.message)
           })
           .catch(err => alert('未检测到代码'))
-      },
-
-      getWebsites () {
-        this.$store.dispatch('getWebsites')
-          .then(res => { this.websites = res.websites })
       }
     },
     mounted () {
-      this.$emit('showSelect')
+      this.$emit('routerTo', 3)
       this.initDarkBgWH()
-      this.getWebsites()
     }
   }
 </script>

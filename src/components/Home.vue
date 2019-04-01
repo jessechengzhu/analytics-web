@@ -57,8 +57,7 @@
       }
     },
     mounted () {
-      console.log('home')
-      this.$emit('hideSelect')
+      this.$emit('routerTo',0)
       this.getOverview()
     }
   }
