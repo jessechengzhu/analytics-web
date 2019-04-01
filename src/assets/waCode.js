@@ -1,7 +1,7 @@
-export default function (trackId) {
+export default function (config) {
   return `&lt;script&gt;
 var _wa= _wa || [ ];
-_wa.push(['track', '${trackId}']);
+_wa.push(['config', '${config}']);
 (function() {
   var newScript = document.createElement('script');
   newScript.async = true;

@@ -1,10 +1,7 @@
 <template>
   <div>
-    <select name="website-select" id="website-select" @change="replaceTo(currentSiteId)" v-model="currentSiteId">
-      <option v-for="website in websites" :value="website.id">{{ website.host }}</option>
-    </select>
+    <h1>统计信息</h1>
     <table>
-      <thead>
       <tr>
         <td></td>
         <td>浏览量PV</td>
@@ -12,85 +9,61 @@
         <td>跳出率</td>
         <td>平均访问时长</td>
       </tr>
-      </thead>
-      <tbody>
-      <tr>
+      <tr v-if="statisticsToday">
         <td>今日</td>
         <td>{{ statisticsToday.pv }}</td>
         <td>{{ statisticsToday.uv }}</td>
-        <td>{{ statisticsToday.bounceRateTd }}</td>
-        <td>{{ statisticsToday.avgDurationTd }}</td>
+        <td>{{ statisticsToday.br }}</td>
+        <td>{{ statisticsToday.ad }}</td>
       </tr>
-      <tr>
+      <tr v-if="statisticsYesterday">
         <td>昨日</td>
         <td>{{ statisticsYesterday.pv }}</td>
         <td>{{ statisticsYesterday.uv }}</td>
-        <td>{{ statisticsYesterday.bounceRateYd }}</td>
-        <td>{{ statisticsYesterday.avgDurationYd }}</td>
+        <td>{{ statisticsYesterday.br }}</td>
+        <td>{{ statisticsYesterday.ad }}</td>
       </tr>
-      </tbody>
     </table>
   </div>
 </template>
 
 <script>
+  import { mapState } from 'vuex'
   export default {
     name: 'Statistics',
     data () {
       return {
-        websites: [],
-        currentSiteId: 0,
         statisticsToday: {},
         statisticsYesterday: {}
       }
     },
+    computed: mapState(['currentWebsite']),
     methods: {
-      /* 更改路由 */
-      replaceTo (id) {
-        this.$router.replace('/statistics/' + id)
-      },
-      getSiteData (id,date) {
-        this.$store.dispatch('getStatistics', {id,date})  // 获取指定网站的信息
+      getSiteData (date) {
+        this.$store.dispatch('getStatistics', date)  // 获取网站指定日期的统计信息
           .then(res => {
             switch (date) {
               case 0:
-                this.statisticsToday = res.data.statistics
+                this.statisticsToday = res.statistics
                 break
               case 1:
-                this.statisticsYesterday = res.data.statistics
+                this.statisticsYesterday = res.statistics
                 break
             }
-            this.currentSiteId = id  // 更改select的currentSiteId
           })
       },
       loadPage () {
-        this.$store.dispatch('getWebsites')  // 获取所有网站
-          .then(res => {
-            this.websites = res.data.websites
-            if (this.websites.length !== 0) {  // 有网站
-              const params = this.$route.params
-              let currentSiteId
-              if (JSON.stringify(params) !== '{}') { //有查询
-                currentSiteId = params.id
-              } else {  // 没有指定查询，默认查询第一个网站
-                currentSiteId = this.websites[0].id
-              }
-              this.getSiteData(currentSiteId,0)  // 获取currentSiteId的网站数据
-              this.getSiteData(currentSiteId,1)
-            } else { // 还没有网站
-              alert('你还没有网站，快去添加一个吧')
-              this.$router.push('/manage')
-            }
-          })
+        this.getSiteData(0)
+        this.getSiteData(1)
       }
     },
     watch: {
-      /* 监视路由的变化,重新加载页面 */
-      '$route' (to, from) {
+      currentWebsite(){
         this.loadPage()
       }
     },
     mounted () {
+      console.log('statistics')
       this.loadPage()
     }
   }

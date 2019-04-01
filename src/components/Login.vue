@@ -31,11 +31,11 @@ export default {
         }
         this.$store.dispatch('login', loginInfo)
           .then(res => {
-            this.message = res.data.message
+            this.message = res.message
             this.$router.push('/')
           })
           .catch(err => {
-            this.message = err.response.data.message
+            this.message = err.message
           })
       }
     }

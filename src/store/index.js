@@ -10,7 +10,9 @@ Vue.use(Vuex)
 // 全局state
 const state = {
   isLogin: false,
-  user: null
+  user: null,
+  websites: [],
+  currentWebsite: null
 }
 export default new Vuex.Store({
   state,

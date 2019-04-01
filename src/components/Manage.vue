@@ -42,7 +42,7 @@
       <ul>
         <li v-for="website in websites" :key="website.id">
           {{website.host}}
-          <a href="javascript:void(0);" @click="setCode(website.track_id),showGetCode()">获取代码</a>
+          <a href="javascript:void(0);" @click="setCode(website.config),showGetCode()">获取代码</a>
           <a href="javascript:void(0);" @click="checkCode(website)">代码检查</a>
         </li>
       </ul>
@@ -91,15 +91,17 @@
         this.$store.dispatch('addWebsite', submitInfo)
           .then(res => {
             this.isAddWebsite = false
-            this.websites.push(res.data.website)
+            this.websites.push(res.website)
+            this.hostIpt = ''
+            this.indexIpt = ''
           })
           .catch(() => {
             alert('添加失败')
           })
       },
 
-      setCode (trackId) {
-        this.code = waCode(trackId)
+      setCode (config) {
+        this.code = waCode(config)
       },
       showGetCode () {
         this.isGetCode = true
@@ -120,18 +122,19 @@
 
       checkCode (website) {
         this.$store.dispatch('validateSite', website.id)
-          .then(res=>{
-            alert(res.data.message)
+          .then(res => {
+            alert(res.message)
           })
-          .catch(err=> alert('未检测到代码'))
+          .catch(err => alert('未检测到代码'))
       },
 
-      getWebsites(){
+      getWebsites () {
         this.$store.dispatch('getWebsites')
-          .then(res => { this.websites = res.data.websites })
+          .then(res => { this.websites = res.websites })
       }
     },
     mounted () {
+      this.$emit('showSelect')
       this.initDarkBgWH()
       this.getWebsites()
     }

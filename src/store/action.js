@@ -10,49 +10,52 @@ if (process.env.NODE_ENV === 'development') {
 
 // axios请求拦截器，每次请求前都带上token
 axios.interceptors.request.use(function (config) {
-  // Do something before request is sent
   if (localStorage.getItem('token')) {
     config.headers.Authorization = 'Bearer ' + localStorage.getItem('token')
   }
   return config
 }, function (error) {
-  // Do something with request error
-  return Promise.reject(error)
+  return error
 })
 
 // axios响应拦截器
 axios.interceptors.response.use(function (response) {
-  // Do something with response data
-  return response
+  if (response.data.status === 2) {
+    return response.data
+  } else {
+    return Promise.reject(response.data) // 自定义错误
+  }
 }, function (error) {
-  // Do something with response error
   if (error.response.data.message === 'jwt expired') { // 身份过期错误
     console.log('身份过期，请重新登录')
     store.commit('clearUser')
     router.push('/login')
-  } else {
-    return Promise.reject(error)
+    return Promise.resolve(error.response.data)
+  } else { // 普通错误
+    return error.response.data
   }
 })
 
 export default {
   /* 用户 */
   getUser ({commit}) {
-    axios.get('/api/users/user')
-      .then(res => {
-        commit('setUser', res.data)
-      })
-      .catch(() => { // 获取失败了，清除这个无效token
-        commit('clearUser')
-        localStorage.setItem('token', '')
-      })
+    if (localStorage.getItem('token')) {
+      axios.get('/api/users/user')
+        .then(res => {
+          commit('setUser', res.user)
+        })
+        .catch(() => { // 获取失败了，清除这个无效token
+          commit('clearUser')
+          localStorage.setItem('token', '')
+        })
+    }
   },
   login ({commit}, loginInfo) {
     return new Promise((resolve, reject) => {
-      axios.post('/api/users/login',loginInfo)
+      axios.post('/api/users/login', loginInfo)
         .then(res => {
-          commit('setUser', res.data)
-          localStorage.setItem('token', res.data.token) // 存储从后端获得的token
+          commit('setUser', res.user)
+          localStorage.setItem('token', res.token) // 存储从后端获得的token
           resolve(res)
         })
         .catch(err => {
@@ -64,8 +67,8 @@ export default {
     return new Promise((resolve, reject) => {
       axios.post('/api/users/register', registerInfo)
         .then(res => {
-          commit('setUser', res.data)
-          localStorage.setItem('token', res.data.token) // 存储从后端获得的token
+          commit('setUser', res.user)
+          localStorage.setItem('token', res.token) // 存储从后端获得的token
           resolve(res)
         })
         .catch(err => {
@@ -81,16 +84,22 @@ export default {
     })
   },
   /* 网站 */
-  getWebsites () {
-    return new Promise((resolve, reject) => {
-      axios.get('/api/websites/user')
-        .then(res => {
-          resolve(res)
-        })
-        .catch(err => {
-          reject(err)
-        })
-    })
+  getWebsites ({state, commit}) {
+    if (localStorage.getItem('token')) {
+      return new Promise((resolve, reject) => {
+        axios.get('/api/websites/user')
+          .then(res => {
+            commit('setWebsites', res.websites)
+            if (!state.currentWebsite && res.websites.length !== 0) {
+              commit('setCurrentWebsite', res.websites[0])
+            }
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    }
   },
   validateSite (context, id) {
     return new Promise((resolve, reject) => {
@@ -115,32 +124,50 @@ export default {
     })
   },
   getWebsite (context, id) {
-    return new Promise((resolve, reject) => {
-      websiteApi.getWebsite(id)
-        .then(res => {
-          resolve(res)
-        })
-        .catch(err => {
-          reject(err)
-          console.log(err.response ? err.response.data.message : 'error')
-        })
-    })
+    if (localStorage.getItem('token')) {
+      return new Promise((resolve, reject) => {
+        axios.get('/api/websites/website/' + id)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      })
+    }
   },
   getOverview () {
     return new Promise((resolve, reject) => {
-      axios.get('/api/websites/overview')
-        .then(res => resolve(res))
+      if (localStorage.getItem('token')) {
+        axios.get('/api/websites/overview')
+          .then(res => resolve(res))
+      }
     })
   },
-  getStatistics (context, {id, date}) {
+  getStatistics ({state}, date) {
     return new Promise((resolve, reject) => {
-      axios.get('/api/websites/website/statistics/' + id + '?date=' + date)
-        .then(res => {
-          resolve(res)
-        })
-        .catch(err => {
-          reject(err)
-        })
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/statistics/' + state.currentWebsite.id + '?date=' + date)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
+  getLimitRecords ({state}, page) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/records/' + state.currentWebsite.id + '?page=' + page)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
     })
   }
 }

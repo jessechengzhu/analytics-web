@@ -1,67 +1,156 @@
 <template>
   <div id="app">
-    <div class="container header">
-      <div class="container-wrap header-wrap">
-        <ul class="clear cate">
-          <router-link tag="li" to="/"><img src="./assets/logo.png" alt="logo"></router-link>
-          <router-link tag="li" to="/">主页</router-link>
-          <router-link tag="li" to="/statistics">统计</router-link>
-          <router-link tag="li" to="/analysis">分析</router-link>
-          <router-link tag="li" to="/manage">管理</router-link>
-        </ul>
-        <ul class="clear user" v-if="isLogin">
-          <li @click="logout">{{user.username||''}}<span></span></li>
-        </ul>
-        <ul class="clear sign" v-else>
-          <router-link class="login" to="/login" tag="li">登录</router-link>
-          <router-link class="register" to="/register" tag="li">注册</router-link>
-        </ul>
+    <div class="header">
+      <div class="nav nav-left">
+        <div class="logo"></div>
+        <div class="select" @click="toggleSelect">
+          {{selectInfo}}&nbsp;<i class="fa fa-lg" :class="{'fa-caret-right': !showSelect, 'fa-caret-left': showSelect}"></i>
+        </div>
+        <div class="select-content" v-show="showSelect">
+          <ul>
+            <li v-for="website in websites" @click="selectWebsite(website)">{{ website.host }}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="nav nav-right">
+        <div class="user" v-if="isLogin&&user">
+          <div class="user-avatar" @click="toggleUserOperation">
+            <i class="fa fa-user-circle-o"></i>&nbsp;{{user.username}}&nbsp;<i class="fa fa-lg" :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
+          </div>
+          <div class="user-operation" v-show="showUserOperation">
+            <a @click="logout">其他操作</a>
+            <a @click="logout">登出</a>
+          </div>
+        </div>
+        <div class="sign" v-else>
+          <router-link class="login" to="/login" tag="a">登录</router-link>
+          <router-link class="register" to="/register" tag="a">注册</router-link>
+        </div>
       </div>
     </div>
-    <div class="container main">
-      <div class="container-wrap main-wrap">
+    <div class="main">
+      <div class="side">
+        <div class="side-bar list-group">
+          <router-link to="/" class="list-group-item" :class="{'choose': chooseH}" @click.native="choose(0)">
+            <i class="fa fa-home fa-fw" style="color: #4f97e7"></i>&nbsp;主页
+          </router-link>
+          <router-link to="/statistics" class="list-group-item" :class="{'choose': chooseS}" @click.native="choose(1)">
+            <i class="fa fa-bar-chart fa-fw" style="color: #e78271"></i>&nbsp;统计
+          </router-link>
+          <router-link to="/analysis" class="list-group-item" :class="{'choose': chooseA}" @click.native="choose(2)">
+            <i class="fa fa-line-chart fa-fw" style="color: #e7cd5a"></i>&nbsp;分析
+          </router-link>
+          <router-link to="/manage" class="list-group-item" :class="{'choose': chooseM}" @click.native="choose(3)">
+            <i class="fa fa-cog fa-fw" style="color: #e76cb2"></i>&nbsp;管理
+          </router-link>
+        </div>
+      </div>
+      <div class="main-wrap">
         <router-view/>
       </div>
     </div>
-    <div class="container footer">
-      <div class="container-wrap footer-wrap">
-        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/" target="_blank">苏ICP备19002725号</a>
-      </div>
-    </div>
+<!--    <div class=" footer">-->
+<!--      <div class="footer-wrap">-->
+<!--        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"-->
+<!--                                                                                   target="_blank">苏ICP备19002725号</a>-->
+<!--      </div>-->
+<!--    </div>-->
+
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-export default {
-  name: 'App',
-  // 映射的计算属性的名称与 state 的子节点名称相同，注意是子节点，模块化后子模块里的结点不能使用
-  computed: mapState(['isLogin', 'user']),
-  methods: {
-    logout () {
-      this.$store.commit('clearUser')
-      this.$router.push('/login')
+  import { mapState } from 'vuex'
+
+  export default {
+    name: 'App',
+    data () {
+      return {
+        selectInfo: '全部网站数据',
+        showSelect: false,
+        showUserOperation: false,
+        chooseH: true,
+        chooseS: false,
+        chooseA: false,
+        chooseM: false,
+      }
     },
-    getUser(){
-      this.$store.dispatch('getUser')
+    computed: mapState(['isLogin', 'user', 'websites', 'currentSiteId']),
+    methods: {
+      /* 隐藏显示选择内容 */
+      toggleSelect () {
+        this.showSelect = !this.showSelect
+      },
+      toggleUserOperation () {
+        this.showUserOperation = !this.showUserOperation
+      },
+      choose (num) {
+        switch (num) {
+          case 0:
+            this.selectInfo = '全部网站数据'
+            this.chooseH = true
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = false
+            break
+          case 1:
+            this.selectInfo = '当前选择：'+ this.$store.state.currentWebsite.host
+            this.chooseH = false
+            this.chooseS = true
+            this.chooseA = false
+            this.chooseM = false
+            break
+          case 2:
+            this.selectInfo = '当前选择：'+ this.$store.state.currentWebsite.host
+            this.chooseH = false
+            this.chooseS = false
+            this.chooseA = true
+            this.chooseM = false
+            break
+          case 3:
+            this.selectInfo = '全部网站数据'
+            this.chooseH = false
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = true
+            break
+          default:
+            this.selectInfo = '全部网站数据'
+            this.chooseH = true
+            this.chooseS = false
+            this.chooseA = false
+            this.chooseM = false
+        }
+      },
+      logout () {
+        this.$store.commit('clearUser')
+        this.$router.push('/login')
+      },
+      getUser () {
+        this.$store.dispatch('getUser')
+      },
+      getWebsites () {
+        this.$store.dispatch('getWebsites')
+      },
+      selectWebsite (website) {
+        if(this.chooseH || this.chooseM){
+          this.choose(1)
+          this.$router.push('/statistics')
+        }
+        this.showSelect = false
+        this.selectInfo = '当前选择：'+ website.host
+        this.$store.commit('setCurrentWebsite', website)
+      }
+    },
+    mounted () {
+      console.log('app')
+      this.getUser()
+      this.getWebsites()
     }
-  },
-  mounted(){
-    this.getUser()
   }
-}
 </script>
 
 <style>
-  *{
-    margin: 0;
-    padding: 0;
-  }
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
 
   .clear:before {
     content: '';
@@ -75,84 +164,193 @@ export default {
     clear: both;
   }
 
-  .container {
+  div.header {
+    box-sizing: content-box;
+    box-shadow: 0 1px  1px 0 rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 0;
     width: 100%;
+    height: 60px;
     min-width: 1300px;
-  }
-
-  .container .container-wrap {
-    width: 1300px;
-    margin: 0 auto;
-  }
-
-  .header {
-    height: 50px;
-    background: #2c3e50;
-  }
-
-  .header .header-wrap {
-    height: 100%;
-    /*background: aliceblue;*/
-  }
-
-  .header-wrap ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .header-wrap li {
-    float: left;
-  }
-
-  .header-wrap .cate {
-    float: left;
-  }
-
-  .header-wrap .sign {
-    float: right;
-  }
-
-  .header-wrap .user {
-    float: right;
-  }
-
-  .header-wrap li {
-    height: 50px;
-    line-height: 50px;
-    padding: 0 30px;
-  }
-
-  .header-wrap .cate li:first-child {
-    padding: 0;
-  }
-
-  .header-wrap .cate li:first-child img {
-    display: block;
-    width: 150px;
-    height: 100%;
-  }
-
-  .header-wrap li:hover {
-    cursor: pointer;
-  }
-
-  .main {
-    background: #eee;
-    padding: 15px 0;
-  }
-
-  .main .main-wrap {
     background: #fff;
   }
 
-  .footer {
-    border-top: 1px solid #333;
-    padding: 15px 0;
+  div.header .nav {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100%;
   }
 
-  .footer .footer-wrap {
-    text-align: center;
+  div.header .nav-left {
+    left: 0;
+  }
+
+  div.header .logo {
+    width: 150px;
+    height: 100%;
+    margin: 0 10px;
+    background-image: url("./assets/logo.png");
+    background-repeat: no-repeat;
+    background-size: 150px 60px;
+  }
+
+  div.header .select {
+    box-sizing: border-box;
+    margin: 5px 0;
+    border-radius: 8px;
+    line-height: 50px;
+    padding: 0 10px;
+    color: #333;
+    font-size: 24px;
+  }
+
+  div.header .select:hover {
+    background: #d4daff;
+    cursor: pointer;
+  }
+
+  div.header .select-content {
+    margin-left: 5px;
+    margin-top: 5px;
+    box-shadow: #4391bf70 0 0 15px;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  div.header .select-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  div.header .select-content li {
+    padding: 0 10px;
+    line-height: 50px;
+    font-size: 16px;
+    color: #828282;
+    font-family: Impact sans-serif;
+  }
+
+  div.header .select-content li:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  div.header .select-content li:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  div.header .select-content li:hover {
+    cursor: pointer;
+    background: #d4daff;
+  }
+
+  div.header .nav-right {
+    right: 0;
+  }
+
+  div.header .sign {
+    margin-right: 10px;
+  }
+
+  div.header .sign a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-family: 微软雅黑 sans-serif;
+    padding: 0 15px;
+    line-height: 60px;
+  }
+
+  div.header .user {
+    margin-right: 10px;
+  }
+
+  div.header .user-avatar {
+    box-sizing: border-box;
+    margin: 5px 0;
+    border-radius: 8px;
+    color: #333;
+    line-height: 50px;
+    font-size: 20px;
+    text-align: right;
+    padding: 0 10px;
+  }
+
+  div.header .user-avatar:hover {
+    cursor: pointer;
+    background: #d4daff;
+  }
+
+  div.header .user-operation {
+    min-width: 100px;
+    margin-top: -5px;
+    border-radius: 6px;
+    box-shadow: #4391bf70 0 0 15px;
+    background: #fff;
+  }
+
+  div.header .user-operation a {
+    display: block;
+    padding: 0 10px;
+    line-height: 50px;
+    text-align: right;
+    font-size: 16px;
+    color: #828282;
+    font-family: 微软雅黑 sans-serif;
+  }
+
+  div.header .user-operation a:hover {
+    cursor: pointer;
+    background: #d4daff;
+  }
+
+  div.main {
+    background: #fff;
+    margin-top: 60px;
+  }
+
+  div.main .side {
+    position: fixed;
+    box-sizing: border-box;
+    box-shadow: 1px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  div.main .side-bar {
+    box-sizing: border-box;
+  }
+
+  div.main .side-bar a {
+    display: block;
+    box-sizing: border-box;
+    width: 200px;
+    padding: 10px;
+    text-decoration: none;
+    color: #464646;
+    font-weight: bold;
+    line-height: 40px;
+    font-size: 20px;
+    transition: all 0.2s ease-in;
+  }
+
+  div.main .side-bar a:hover {
+    background: #d4daff80;
+  }
+
+  div.main .side-bar a.choose {
+    line-height: 60px;
+    font-size: 30px;
+    background: #d4daff;
+  }
+
+  div.main .main-wrap {
+    margin-left: 200px;
+
   }
 
 </style>

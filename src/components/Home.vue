@@ -8,13 +8,19 @@
           <td>网站名称</td>
           <td>今日浏览量PV</td>
           <td>今日流量UV</td>
+          <td>今日跳出率</td>
+          <td>今日平均访问时长</td>
+          <td>实时在线人数</td>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="website in overview" :key="website.id" @click="toStatistics(website.id)">
+        <tr v-for="website in overview" :key="website.id" @click="toStatistics(website)">
           <td>{{ website.host }}</td>
-          <td>{{ website.pvToday }}</td>
-          <td>{{ website.uvToday }}</td>
+          <td>{{ website.pv }}</td>
+          <td>{{ website.uv }}</td>
+          <td>{{ website.br }}</td>
+          <td>{{ website.ad }}</td>
+          <td>{{ website.ol }}</td>
         </tr>
         </tbody>
       </table>
@@ -43,13 +49,16 @@
     methods: {
       getOverview(){
         this.$store.dispatch('getOverview')
-          .then(res => { this.overview = res.data.overview })
+          .then(res => { this.overview = res.overview })
       },
-      toStatistics (id) {
-        this.$router.push('/statistics/'+id)
+      toStatistics (website) {
+        this.$store.commit('setCurrentWebsite',website)
+        this.$router.push('/statistics')
       }
     },
     mounted () {
+      console.log('home')
+      this.$emit('hideSelect')
       this.getOverview()
     }
   }

@@ -111,14 +111,14 @@ export default {
             return this.$store.dispatch('register', registerInfo)
           })
           .then(res => {
-            this.message = res.data.message
+            this.message = res.message
             this.$router.push('/')
           })
           .catch(err => {
-            this.usrMsg = err.response.data.message || '×'
+            this.usrMsg = err.message || '×'
           })
           .catch(err => {
-            this.message = err.response.data.message || ''
+            this.message = err.message || ''
           })
       }
     }
@@ -131,7 +131,7 @@ export default {
             this.usrMsg = '✔'
           })
           .catch(err => {
-            this.usrMsg = err.response.data.message || '×'
+            this.usrMsg = err.message || '×'
           })
       }
     },
