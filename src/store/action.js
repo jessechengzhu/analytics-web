@@ -30,6 +30,7 @@ axios.interceptors.response.use(function (response) {
     console.log('身份过期，请重新登录')
     store.commit('clearUser')
     router.push('/login')
+    history.go(0)
     return Promise.resolve(error.response.data)
   } else { // 普通错误
     return error.response.data

@@ -2,7 +2,7 @@
   <div id="app">
     <div class="header">
       <div class="nav nav-left">
-        <div class="logo"></div>
+        <router-link to="/" class="logo" tag="div"></router-link>
         <div class="select" @click="toggleSelect">
           {{selectInfo}}&nbsp;<i class="fa fa-lg"
                                  :class="{'fa-caret-right': !showSelect, 'fa-caret-left': showSelect}"></i>
@@ -47,11 +47,9 @@
           </router-link>
         </div>
       </div>
-      <div class="main-wrap">
-        <router-view
+      <router-view class="main-wrap"
           @routerTo="routerTo"
         />
-      </div>
     </div>
     <!--    <div class=" footer">-->
     <!--      <div class="footer-wrap">-->
@@ -82,10 +80,9 @@
     computed: mapState(['isLogin', 'user', 'websites', 'currentWebsite']),
     methods: {
       logout () {
+        this.$router.replace('/login')
         this.selectInfo = '全部网站数据'
         this.$store.commit('clearUser')
-        this.$router.replace('/login')
-        sessionStorage.removeItem('website')
       },
       getUser () {
         this.$store.dispatch('getUser')
@@ -217,7 +214,9 @@
     width: 100%;
     height: 60px;
     min-width: 1300px;
-    background: #fff;
+    background: linear-gradient(90deg, #6982e7, #e791bb);
+    color: #fff;
+    z-index: 10;
   }
 
   div.header .nav {
@@ -241,6 +240,7 @@
     background-image: url("./assets/logo.png");
     background-repeat: no-repeat;
     background-size: 150px 60px;
+    cursor: pointer;
   }
 
   div.header .select {
@@ -249,12 +249,12 @@
     border-radius: 8px;
     line-height: 50px;
     padding: 0 10px;
-    color: #333;
+    /*color: #333;*/
     font-size: 24px;
   }
 
   div.header .select:hover {
-    background: #d4daff;
+    background: #e791bb;
     cursor: pointer;
   }
 
@@ -277,7 +277,7 @@
     line-height: 50px;
     font-size: 16px;
     color: #828282;
-    font-family: Impact sans-serif;
+    font-family: Helvetica, sans-serif;
   }
 
   div.header .select-content li:first-child {
@@ -292,7 +292,8 @@
 
   div.header .select-content li:hover {
     cursor: pointer;
-    background: #d4daff;
+    background: #e791bb;
+    color: #fff;
   }
 
   div.header .nav-right {
@@ -305,9 +306,9 @@
 
   div.header .sign a {
     text-decoration: none;
-    color: #333;
+    /*color: #333;*/
     font-weight: bold;
-    font-family: 微软雅黑 sans-serif;
+    font-family: "微软雅黑", sans-serif;
     padding: 0 15px;
     line-height: 60px;
   }
@@ -320,7 +321,7 @@
     box-sizing: border-box;
     margin: 5px 0;
     border-radius: 8px;
-    color: #333;
+    /*color: #333;*/
     line-height: 50px;
     font-size: 20px;
     text-align: right;
@@ -329,7 +330,7 @@
 
   div.header .user-avatar:hover {
     cursor: pointer;
-    background: #d4daff;
+    background: #6982e7;
   }
 
   div.header .user-operation {
@@ -347,12 +348,21 @@
     text-align: right;
     font-size: 16px;
     color: #828282;
-    font-family: 微软雅黑 sans-serif;
+    font-family: "微软雅黑", sans-serif;
+  }
+  div.header .user-operation  a:first-child{
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  div.header .user-operation a:last-child{
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
   }
 
   div.header .user-operation a:hover {
     cursor: pointer;
-    background: #d4daff;
+    background: #6982e7;
+    color: #fff;
   }
 
   div.main {
@@ -395,8 +405,12 @@
   }
 
   div.main .main-wrap {
-    margin-left: 200px;
-
+    position: absolute;
+    left: 200px;
+    right: 0;
+    top: 60px;
+    bottom: 0;
+    padding: 10px 15px;
   }
 
 </style>

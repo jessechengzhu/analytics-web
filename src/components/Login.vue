@@ -1,57 +1,111 @@
 <template>
-  <div>
-    <h1>登录</h1>
-    <label>用户名<input v-model="username"/></label><br>
-    <label>密码<input v-model="password" type="password"/></label><br>
-    <button @click="login()">登录</button>
-    <p>{{message}}</p>
+  <div class="login-wrap">
+    <h1 class="title">登录</h1>
+    <div class="input">
+      <label for="usrIpt">用户名</label>
+      <input v-model="username" id="usrIpt"/>
+    </div>
+    <div class="input">
+      <label for="pswIpt">密码</label>
+      <input v-model="password" type="password" id="pswIpt"/>
+    </div>
+    <a class="login-btn" @click="login()" href="javascript:void(0)">登录</a>
+    <p class="message">&nbsp;{{message}}&nbsp;</p>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'Login',
-  // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
-  data () {
-    return {
-      username: '',
-      password: '',
-      message: ''
-    }
-  },
-  computed: {
-  },
-  methods: {
-    login () {
-      if (this.username && this.password) {
-        this.message = '登录中...'
-        const loginInfo = {
-          username: this.username,
-          password: this.password
-        }
-        this.$store.dispatch('login', loginInfo)
-          .then(res => {
-            this.message = res.message
-            this.$router.push('/')
-            this.$store.dispatch('getWebsites')
-              .then(res=>{
-                this.$store.commit('setCurrentWebsite', res.websites[0])
-              })
-            this.$emit('routerTo',0)
-          })
-          .catch(err => {
-            this.message = err.message
-          })
+  export default {
+    name: 'Login',
+    // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
+    data () {
+      return {
+        username: '',
+        password: '',
+        message: ''
       }
+    },
+    computed: {},
+    methods: {
+      login () {
+        if (this.username && this.password) {
+          this.message = '登录中...'
+          const loginInfo = {
+            username: this.username,
+            password: this.password
+          }
+          this.$store.dispatch('login', loginInfo)
+            .then(res => {
+              this.message = res.message
+              this.$router.push('/')
+              this.$store.dispatch('getWebsites')
+                .then(res => {
+                  this.$store.commit('setCurrentWebsite', res.websites[0])
+                })
+              this.$emit('routerTo', 0)
+            })
+            .catch(err => {
+              this.message = err.message
+            })
+        }
+      }
+    },
+    mounted () {
+      this.$emit('routerTo', -1)
     }
-  },
-  mounted () {
-    this.$emit('routerTo',-1)
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  div.login-wrap {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+  }
 
+  h1.title {
+    color: #9c9c9c;
+    font-size: 26px;
+    font-weight: normal;
+    font-family: "Arial", sans-serif;
+  }
+
+  div.input {
+    padding: 10px;
+  }
+
+  div.input label {
+    display: inline-block;
+    width: 64px;
+    line-height: 20px;
+    font-size: 16px;
+    color: #666666;
+    font-weight: bold;
+  }
+
+  div.input input {
+    display: inline-block;
+    padding: 5px 10px;
+    width:200px;
+    color: #777777;
+  }
+
+  a.login-btn{
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    background: dodgerblue;
+    padding: 10px 15px;
+    border-radius: 8px;
+  }
+  a.login-btn + p.message{
+    color: darkred;
+    font-weight: bold;
+    font-size: 14px;
+    left: 330px;
+    top: 18px;
+  }
 </style>
