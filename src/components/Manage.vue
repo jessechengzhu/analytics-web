@@ -2,7 +2,7 @@
   <div>
     <div v-if="isAddWebsite" class="add">
       <div class="add-wrap ">
-        <div class="title clear"><span>新增网站</span><span @click="hideAddWebsite">&times</span></div>
+        <div class="title"><span>新增网站</span><span @click="hideAddWebsite">&times</span></div>
         <div class="input">
           <label for="hostIpt">网站域名</label>
           <input type="text" id="hostIpt" placeholder="请输入网站域名" v-model="hostIpt">
@@ -30,7 +30,7 @@
     </div>
     <div v-if="isGetCode" class="code">
       <div class="code-wrap ">
-        <div class="title clear"><span>复制代码</span><span @click="hideGetCode">&times</span></div>
+        <div class="title"><span>复制代码</span><span @click="hideGetCode">&times</span></div>
         <div class="code-content">
           <textarea id="code" v-html="code" readonly></textarea>
         </div>
@@ -256,6 +256,7 @@
     left: 50%;
     border-radius: 5px;
     transform: translate(-50%, -50%);
+    z-index: 15;
   }
 
   div.add-wrap, div.code-wrap {
@@ -273,6 +274,9 @@
     height: 30px;
     margin-right: 10px;
     font-size: 14px;
+  }
+  div.button button:hover{
+    cursor: pointer;
   }
 
   div.button .sure {
@@ -308,27 +312,28 @@
   /* 弹窗标题 */
   div.title {
     position: relative;
-    background: #e0e0e0;
+    background: linear-gradient(90deg, #6982e7, #e791bb);
   }
 
   div.title span:first-child {
+    display: block;
     line-height: 30px;
     font-size: 16px;
-    color: #333;
+    color: #f0f0f0;
     width: 100%;
     text-align: center;
-    float: left;
   }
 
   div.title span:last-child {
     position: absolute;
+    display: block;
     right: 0;
+    top: 0;
     width: 30px;
-    height: 30px;
+    line-height: 30px;
     font-size: 20px;
     font-weight: bold;
     color: #fff;
-    line-height: 30px;
     text-align: center;
     background: red;
   }

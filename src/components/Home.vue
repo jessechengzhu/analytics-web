@@ -15,7 +15,7 @@
         </thead>
         <tbody>
         <tr v-for="website in overview" :key="website.id" @click="toStatistics(website)">
-          <td>{{ website.host }}&nbsp;&nbsp;--&nbsp;&nbsp;网站标题</td>
+          <td>{{ website.host }}&nbsp;&nbsp;--&nbsp;&nbsp;{{website.title}}</td>
           <td>{{ website.pv }}</td>
           <td>{{ website.uv }}</td>
           <td>{{ website.br }}</td>
@@ -26,6 +26,8 @@
       </table>
     </div>
     <div v-else>
+      <h1>这里是我的毕业设计——用户行为分析平台</h1>
+      <h2></h2>
       <router-link to="/login">开始吧</router-link>
     </div>
   </div>
@@ -77,6 +79,7 @@
     box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1);
     font-family: '微软雅黑',sans-serif;
     border-collapse: collapse;
+    table-layout: fixed;
   }
   /* 每一列 */
   table.overview tr td {
@@ -88,8 +91,24 @@
   }
   /* 第一列 */
   table.overview tr td:nth-child(1) {
-    width: 30%;
+    text-align: left;
+    text-indent: 32px;
     border-right: 1px solid rgba(0,0,0,.1);
+  }
+  table.overview tr td:nth-child(2) {
+    width: 128px;
+  }
+  table.overview tr td:nth-child(3) {
+    width: 128px;
+  }
+  table.overview tr td:nth-child(4) {
+    width: 128px;
+  }
+  table.overview tr td:nth-child(5) {
+    width: 128px;
+  }
+  table.overview tr td:nth-child(6) {
+    width: 128px;
   }
   /* 表头每一行 */
   table.overview thead tr {
@@ -112,8 +131,6 @@
   }
   /* 表体第一列 */
   table.overview tbody tr td:nth-child(1){
-    text-align: left;
-    text-indent: 32px;
     color: cornflowerblue;
     border-right: 1px solid rgba(0,0,0,.1);
   }

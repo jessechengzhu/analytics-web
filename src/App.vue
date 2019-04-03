@@ -80,6 +80,8 @@
     computed: mapState(['isLogin', 'user', 'websites', 'currentWebsite']),
     methods: {
       logout () {
+        this.showUserOperation = false
+        this.showSelect = false
         this.$router.replace('/login')
         this.selectInfo = '全部网站数据'
         this.$store.commit('clearUser')
