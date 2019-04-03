@@ -50,11 +50,11 @@
         <div class="user-info">
           <h3>用户信息</h3>
           <ul>
-            <li><span>用户类型</span>：老访客</li>
+            <li><span>用户类型</span>：{{ipIsOld?'旧用户':'新用户'}}</li>
             <li><span>IP地址：</span>{{recordDetail.ip}}</li>
             <li><span>网络服务商：</span>{{recordDetail.service}}</li>
             <li><span>地域：</span>{{recordDetail.address}}</li>
-            <li><span>当天访问次数：</span>1</li>
+            <li><span>当天访问次数：</span>{{ipTodayVisit}}</li>
           </ul>
         </div>
         <div class="device-info">
@@ -82,25 +82,27 @@
       return {
         records: [],
         recordDetail: {},
+        ipIsOld: false,
+        ipTodayVisit: 0,
         isDetail: false
       }
     },
     computed: {
       ...mapState(['currentWebsite']),
-      getOpenTime(){
-        return function (openTime,index) {
-          if(index === 0){
+      getOpenTime () {
+        return function (openTime, index) {
+          if (index === 0) {
             return this.timeToString(this.recordDetail.open_time)
-          }else {
+          } else {
             return this.timeToString(openTime)
           }
         }
       },
-      getURL(){
+      getURL () {
         return function (index) {
-          if(index === 0){
+          if (index === 0) {
             return this.recordDetail.url
-          }else {
+          } else {
             return this.recordDetail.urls[index]
           }
         }
@@ -145,6 +147,11 @@
       showDetail (record) {
         this.recordDetail = record
         this.isDetail = true
+        this.$store.dispatch('getIpInfo',record.ip)
+          .then(res=>{
+            this.ipIsOld = res.isOld
+            this.ipTodayVisit = res.todayVisit
+          })
       },
       hideDetail () {
         this.isDetail = false
@@ -319,24 +326,27 @@
     cursor: pointer;
   }
 
-  div.detail .content{
+  div.detail .content {
     max-height: 400px;
     overflow-y: scroll;
     padding: 10px;
   }
-  div.detail h3{
+
+  div.detail h3 {
     margin: 0;
     line-height: 40px;
     color: #666;
     font-size: 20px;
     font-weight: normal;
   }
-  div.detail table{
+
+  div.detail table {
     font-family: '微软雅黑', sans-serif;
     table-layout: fixed;
     border-collapse: collapse;
     width: 100%;
   }
+
   /* 每一列 */
   div.detail table tr td {
     text-align: left;
@@ -344,10 +354,12 @@
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  div.detail table tr td:first-child{
+
+  div.detail table tr td:first-child {
     width: 84px;
   }
-  div.detail table tr td:last-child{
+
+  div.detail table tr td:last-child {
     width: 84px;
   }
 
@@ -370,26 +382,29 @@
   }
 
 
-  div.detail ul{
+  div.detail ul {
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  div.detail ul li{
+
+  div.detail ul li {
     padding: 4px 0;
     font-size: 14px;
     color: #333;
   }
-  div.detail ul span{
+
+  div.detail ul span {
     font-weight: 600;
   }
 
-  div.detail .user-info{
+  div.detail .user-info {
     margin-top: 10px;
     float: left;
     width: 50%;
   }
-  div.detail .device-info{
+
+  div.detail .device-info {
     margin-top: 10px;
     float: left;
     width: 50%;

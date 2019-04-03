@@ -169,5 +169,18 @@ export default {
           })
       }
     })
+  },
+  getIpInfo ({state}, ip) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/ip/' + state.currentWebsite.id + '?ip=' + ip)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
   }
 }
