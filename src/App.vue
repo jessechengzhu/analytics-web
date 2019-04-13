@@ -36,11 +36,11 @@
           <router-link to="/" class="list-group-item" :class="{'choose': chooseH}">
             <i class="fa fa-home fa-fw" style="color: #4f97e7"></i>&nbsp;主页
           </router-link>
-          <router-link to="/statistics" class="list-group-item" :class="{'choose': chooseS}">
-            <i class="fa fa-bar-chart fa-fw" style="color: #e78271"></i>&nbsp;统计
-          </router-link>
-          <router-link to="/analysis" class="list-group-item" :class="{'choose': chooseA}">
+          <router-link to="/analytics" class="list-group-item" :class="{'choose': chooseA}">
             <i class="fa fa-line-chart fa-fw" style="color: #e7cd5a"></i>&nbsp;分析
+          </router-link>
+          <router-link to="/custom" class="list-group-item" :class="{'choose': chooseC}">
+            <i class="fa fa-bar-chart fa-fw" style="color: #e78271"></i>&nbsp;高级
           </router-link>
           <router-link to="/manage" class="list-group-item" :class="{'choose': chooseM}">
             <i class="fa fa-cog fa-fw" style="color: #e76cb2"></i>&nbsp;管理
@@ -72,8 +72,8 @@
         showSelect: false,
         showUserOperation: false,
         chooseH: true,
-        chooseS: false,
         chooseA: false,
+        chooseC: false,
         chooseM: false,
       }
     },
@@ -112,44 +112,44 @@
         switch (num) {
           case -1:
             this.chooseH = false
-            this.chooseS = false
             this.chooseA = false
+            this.chooseC = false
             this.chooseM = false
             break
           case 0:
             this.chooseH = true
-            this.chooseS = false
             this.chooseA = false
+            this.chooseC = false
             this.chooseM = false
             break
           case 1:
             this.chooseH = false
-            this.chooseS = true
-            this.chooseA = false
+            this.chooseA = true
+            this.chooseC = false
             this.chooseM = false
             break
           case 2:
             this.chooseH = false
-            this.chooseS = false
-            this.chooseA = true
+            this.chooseA = false
+            this.chooseC = true
             this.chooseM = false
             break
           case 3:
             this.chooseH = false
-            this.chooseS = false
             this.chooseA = false
+            this.chooseC = false
             this.chooseM = true
             break
           default:
             this.chooseH = true
-            this.chooseS = false
             this.chooseA = false
+            this.chooseC = false
             this.chooseM = false
         }
       },
       selectWebsite (website) {
         if (this.chooseH || this.chooseM) {
-          this.$router.push('/statistics')
+          this.$router.push('/analytics')
         }
         this.showSelect = false
         this.selectInfo = '当前选择：' + website.host
@@ -162,7 +162,7 @@
           this.selectInfo = '全部网站数据'
         }
       },
-      chooseS (choose) {
+      chooseC (choose) {
         if (choose && this.currentWebsite) {
           this.selectInfo = '当前选择：' + this.currentWebsite.host
         }
@@ -179,7 +179,7 @@
       },
       /* 用于监听刷新页面后vuex数据丢失问题 */
       currentWebsite (website) {
-        if (this.chooseS || this.chooseA) {
+        if (this.chooseC || this.chooseA) {
           this.selectInfo = '当前选择：' + website.host
         }
       }
@@ -208,6 +208,7 @@
     clear: both;
   }
 
+  /* App组件样式 */
   div.header {
     box-sizing: content-box;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);

@@ -14,7 +14,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="website in overview" :key="website.id" @click="toStatistics(website)">
+        <tr v-for="website in overview" :key="website.id" @click="toAnalytics(website)">
           <td>{{ website.host }}&nbsp;&nbsp;--&nbsp;&nbsp;{{website.title}}</td>
           <td>{{ website.pv }}</td>
           <td>{{ website.uv }}</td>
@@ -53,9 +53,9 @@
         this.$store.dispatch('getOverview')
           .then(res => { this.overview = res.overview })
       },
-      toStatistics (website) {
+      toAnalytics (website) {
         this.$store.commit('setCurrentWebsite', website)
-        this.$router.push('/statistics')
+        this.$router.push('/analytics')
       }
     },
     mounted () {

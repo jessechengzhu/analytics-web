@@ -1,13 +1,8 @@
 export default function (config) {
-  return `&lt;script&gt;
-var _wa= _wa || [ ];
-_wa.push(['config', '${config}']);
-(function() {
-  var newScript = document.createElement('script');
-  newScript.async = true;
-  newScript.src = 'http://analytics.server.jessezhu.cn/resources/javascripts/wa.js';
-  var firstScript = document.getElementsByTagName('script')[0];
-  firstScript.parentNode.insertBefore(newScript, firstScript);
-})();
+  return `&lt;script async src="http://analytics.server.jessezhu.cn/resources/javascripts/wa.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    window.waData = window.waData || [];
+    function waTag(){waData.push(arguments);}
+    waTag('config', '${config}');
 &lt;/script&gt;`
 }

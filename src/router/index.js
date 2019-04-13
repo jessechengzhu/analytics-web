@@ -2,8 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // @指src
 import Home from '../components/Home.vue'
-import Analysis from '../components/Analysis.vue'
-import Statistics from '../components/Statistics.vue'
+import Analytics from '../components/Analytics.vue'
+import Custom from '../components/Custom.vue'
 import Manage from '../components/Manage.vue'
 import Login from '../components/Login.vue'
 import Register from '../components/Register.vue'
@@ -20,25 +20,25 @@ const router = new Router({
 
     },
     {
-      path: '/analysis',
-      name: 'analysis',
-      component: Analysis,
+      path: '/analytics',
+      name: 'analytics',
+      component: Analytics,
       meta: {
         requireAuth: true // 访问此url需要通过token进行auth认证
       }
     },
     {
-      path: '/statistics',
-      name: 'statistics',
-      component: Statistics,
+      path: '/custom',
+      name: 'custom',
+      component: Custom,
       meta: {
         requireAuth: true // 访问此url需要通过token进行auth认证
       },
       children: [
         {
-          // /statistics/id
+          // /custom/id
           path: ':id',
-          component: Statistics,
+          component: Custom,
           meta: {
             requireAuth: true // 访问此url需要通过token进行auth认证
           }

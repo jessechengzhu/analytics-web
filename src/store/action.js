@@ -157,6 +157,19 @@ export default {
       }
     })
   },
+  getCompareData ({state}, days) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/compare/' + state.currentWebsite.id + '?days=' + days)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
   getLimitRecords ({state}, page) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
@@ -170,10 +183,23 @@ export default {
       }
     })
   },
-  getIpInfo ({state}, ip) {
+  getRecordsCount ({state}) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
-        axios.get('/api/websites/website/ip/' + state.currentWebsite.id + '?ip=' + ip)
+        axios.get('/api/websites/website/records/' + state.currentWebsite.id)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
+  getRecordMore ({state}, id) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/records/more/' + id)
           .then(res => {
             resolve(res)
           })

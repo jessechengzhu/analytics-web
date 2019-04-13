@@ -95,7 +95,7 @@
         this.isAddWebsite = false
       },
       submitAddWebsite () {
-        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt}
+        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt, title: this.titleIpt}
         this.$store.dispatch('addWebsite', submitInfo)
           .then(res => {
             this.isAddWebsite = false
@@ -389,9 +389,9 @@
   }
 
   div.code-wrap .code-content {
-    width: 570px;
-    height: 200px;
-    padding: 15px;
+    width: 580px;
+    height: 150px;
+    padding: 10px;
     color: #333;
   }
 
