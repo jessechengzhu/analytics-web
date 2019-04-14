@@ -7,9 +7,9 @@
     </div>
     <div class="input">
       <label for="pswIpt">密码</label>
-      <input v-model="password" type="password" id="pswIpt"/>
+      <input v-model="password" @keyup.enter="login" type="password" id="pswIpt"/>
     </div>
-    <a class="login-btn" @click="login()" href="javascript:void(0)">登录</a>
+    <a class="login-btn" @click="login" href="javascript:void(0)">登录</a>
     <p class="message">&nbsp;{{message}}&nbsp;</p>
   </div>
 </template>
@@ -87,7 +87,8 @@
 
   div.input input {
     display: inline-block;
-    padding: 5px 10px;
+    padding: 2px 10px;
+    line-height: 20px;
     width:200px;
     color: #777777;
   }

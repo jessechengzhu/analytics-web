@@ -48,16 +48,9 @@
         </div>
       </div>
       <router-view class="main-wrap"
-          @routerTo="routerTo"
-        />
+                   @routerTo="routerTo"
+      />
     </div>
-    <!--    <div class=" footer">-->
-    <!--      <div class="footer-wrap">-->
-    <!--        Copyright&nbsp;©&nbsp;<a title="qq:1290279000">Jesse Zhu</a>&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"-->
-    <!--                                                                                   target="_blank">苏ICP备19002725号</a>-->
-    <!--      </div>-->
-    <!--    </div>-->
-
   </div>
 </template>
 
@@ -164,12 +157,12 @@
       },
       chooseC (choose) {
         if (choose && this.currentWebsite) {
-          this.selectInfo = '当前选择：' + this.currentWebsite.host
+          this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
         }
       },
       chooseA (choose) {
         if (choose && this.currentWebsite) {
-          this.selectInfo = '当前选择：' + this.currentWebsite.host
+          this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
         }
       },
       chooseM (choose) {
@@ -206,6 +199,20 @@
     content: '';
     display: block;
     clear: both;
+  }
+
+  p.footer{
+    font-size: 14px;
+    color: #666;
+    text-align: center;;
+  }
+  p.footer a{
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  p.footer a:hover{
+    text-decoration: underline;
   }
 
   /* App组件样式 */
@@ -353,11 +360,13 @@
     color: #828282;
     font-family: "微软雅黑", sans-serif;
   }
-  div.header .user-operation  a:first-child{
+
+  div.header .user-operation a:first-child {
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
   }
-  div.header .user-operation a:last-child{
+
+  div.header .user-operation a:last-child {
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
   }
@@ -412,8 +421,7 @@
     left: 200px;
     right: 0;
     top: 60px;
-    bottom: 0;
-    padding: 10px 15px;
+    padding: 0 15px;
   }
 
 </style>

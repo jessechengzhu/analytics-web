@@ -30,7 +30,7 @@ axios.interceptors.response.use(function (response) {
     console.log('身份过期，请重新登录')
     store.commit('clearUser')
     router.push('/login')
-    history.go(0)
+    // history.go(0)
     return Promise.resolve(error.response.data)
   } else { // 普通错误
     return error.response.data
@@ -147,7 +147,7 @@ export default {
   getStatistics ({state}, date) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
-        axios.get('/api/websites/website/statistics/' + state.currentWebsite.id + '?date=' + date)
+        axios.get('/api/websites/website/statistics/' + state.currentWebsite.config + '?date=' + date)
           .then(res => {
             resolve(res)
           })
@@ -160,7 +160,7 @@ export default {
   getCompareData ({state}, days) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
-        axios.get('/api/websites/website/compare/' + state.currentWebsite.id + '?days=' + days)
+        axios.get('/api/websites/website/compare/' + state.currentWebsite.config + '?days=' + days)
           .then(res => {
             resolve(res)
           })
@@ -173,7 +173,7 @@ export default {
   getLimitRecords ({state}, page) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
-        axios.get('/api/websites/website/records/' + state.currentWebsite.id + '?page=' + page)
+        axios.get('/api/websites/website/records/' + state.currentWebsite.config + '?page=' + page)
           .then(res => {
             resolve(res)
           })
@@ -186,7 +186,7 @@ export default {
   getRecordsCount ({state}) {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
-        axios.get('/api/websites/website/records/' + state.currentWebsite.id)
+        axios.get('/api/websites/website/records/' + state.currentWebsite.config)
           .then(res => {
             resolve(res)
           })
@@ -200,6 +200,32 @@ export default {
     return new Promise((resolve, reject) => {
       if (state.currentWebsite) {
         axios.get('/api/records/more/' + id)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
+  getONVisitorData ({state}, days) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/novisitor/' + state.currentWebsite.config + '?days=' + days)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
+  getSVisitorData ({state}, days) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/svisitor/' + state.currentWebsite.config + '?days=' + days)
           .then(res => {
             resolve(res)
           })

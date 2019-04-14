@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--今昨日统计数据-->
     <h1 class="title">统计信息</h1>
     <table class="statistics">
       <thead>
@@ -28,6 +29,7 @@
       </tr>
       </tbody>
     </table>
+    <!--指定日期统计数据-->
     <div class="statistics-choose clear">
       <el-date-picker
         class="choose-date"
@@ -42,8 +44,9 @@
         <div>平均访问时长：<span>{{ statisticsChoose.ad }}</span></div>
       </div>
     </div>
+    <!--pv uv br ad的折线图比较-->
     <div class="compare">
-      <el-tabs v-model="activeName" @tab-click="handleClick">
+      <el-tabs v-model="activeName">
         <el-tab-pane label="浏览量PV/次" name="pv">
           <canvas id="pvCanvas" width="400" height="100">
             <p>Canvas</p>
@@ -74,6 +77,7 @@
         </el-option>
       </el-select>
     </div>
+    <!--实时访客数据-->
     <h1 class="title">实时访客</h1>
     <table class="visitor">
       <thead>
@@ -154,7 +158,43 @@
       </div>
 
     </div>
-    <h1 class="title">访客分析</h1>
+    <!--访客分析-->
+    <div class="clear">
+      <!--新旧访客分析-->
+      <div class="new-old-visitor">
+        <h1 class="title">新旧访客</h1>
+        <div class="visitor-select">
+          <el-select v-model="visitorDate">
+            <el-option
+              v-for="item of visitorOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <canvas id="novCanvas" width="200" height="100">
+          <p>Canvas</p>
+        </canvas>
+      </div>
+      <!-- 留存分析-->
+      <div class="stay-visitor">
+        <h1 class="title">留存分析</h1>
+        <div class="visitor-input">
+          <el-input-number v-model="activeDays" :precision="0" :step="15" :min="7" :max="90" label="描述文字"></el-input-number>
+          <el-tooltip class="item" effect="dark" placement="right" >
+            <div slot="content">-设置流失标准-<br/><br/>你可以在此设置<br/>多少天未访问的<br/>用户为流失用户<br/>最小为7天<br/>最大为90天</div>
+            <el-button><i class="fa fa-question-circle"></i></el-button>
+          </el-tooltip>
+        </div>
+        <canvas id="svCanvas" width="200" height="100">
+          <p>Canvas</p>
+        </canvas>
+      </div>
+      <!--地域分析-->
+      <div class="region-visitor"></div>
+    </div>
+    <p class="footer">&copy;Jesse Zhu&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/" target="_blank">苏ICP备19002725号</a></p>
   </div>
 </template>
 
@@ -181,6 +221,9 @@
           value: '7',
           label: '近七天'
         }, {
+          value: '15',
+          label: '近十五天'
+        },{
           value: '30',
           label: '近一个月'
         }],
@@ -196,7 +239,26 @@
         recordDetail: {},
         ipIsOld: false,
         ipThatDayVisit: 0,
-        isDetail: false
+        isDetail: false,
+        /* 新旧访客饼状图 */
+        visitorDate: '1',
+        visitorOptions: [{
+          value: '1',
+          label: '今天'
+        }, {
+          value: '3',
+          label: '近三天'
+        }, {
+          value: '7',
+          label: '近七天'
+        }, {
+          value: '30',
+          label: '近一个月'
+        }],
+        novChart: null,
+        /* 留存分析饼状图 */
+        activeDays: 30,
+        svChart: null,
       }
     },
     computed: {
@@ -237,69 +299,7 @@
       }
     },
     methods: {
-      /* 时间转化工具 */
-      timeToDay (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        return month + '月' + day + '日'
-      },
-      timeToFullString (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const year = date.getFullYear()
-        const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
-        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-        return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
-      },
-      timeToString (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-        return hour + ':' + minute + ':' + second
-      },
-      secondsToMinutes (seconds) {
-        let time = ''
-        seconds = parseInt(seconds)
-        if (seconds > 59) {
-          let minutes = Math.floor(seconds / 60)
-          seconds = seconds % 60
-          time = minutes + `′` + seconds + `″`
-        } else {
-          time = seconds + `″`
-        }
-        return time
-      },
-      /* 获取统计数据 */
-      getStatistics (date) {
-        this.$store.dispatch('getStatistics', date)  // 获取网站指定日期的统计信息
-          .then(res => {
-            switch (date) {
-              case 0:
-                this.statisticsToday = res.statistics
-                break
-              case 1:
-                this.statisticsYesterday = res.statistics
-                break
-            }
-          })
-      },
-      getStatisticsChoose (dayNum) {
-        this.$store.dispatch('getStatistics', dayNum)  // 获取网站指定日期的统计信息
-          .then(res => {
-            this.statisticsChoose = res.statistics
-          })
-      },
-      /* 折线比较图 */
-      handleClick (tab, event) {
-        // console.log(this.activeName)
-      },
+      /* canvas */
       drawCanvas () {
         this.pvChart = new Chart(document.getElementById('pvCanvas'), {
           type: 'line',
@@ -405,20 +405,122 @@
             }
           }
         })
+        this.novChart = new Chart(document.getElementById('novCanvas'), {
+          type: 'pie',
+          data: {
+            labels: ['新访客', '旧访客'],
+            datasets: [{
+              data: [0, 0],
+              backgroundColor: ['rgb(105,255,102)', 'rgb(122,141,255)'],
+              borderColor: 'rgb(255,255,255)',
+              borderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,// 图表是否响应式
+            legend: {   // 图例
+              display: true,
+            },
+          }
+        })
+        this.svChart = new Chart(document.getElementById('svCanvas'), {
+          type: 'pie',
+          data: {
+            labels: ['活跃用户', '沉默用户', '流失用户'],
+            datasets: [{
+              data: [10, 10 ,10],
+              backgroundColor: ['rgb(255,70,48)', 'rgb(202,122,255)','rgb(80,80,80)'],
+              borderColor: 'rgb(255,255,255)',
+              borderWidth: 3
+            }],
+          },
+          options: {
+            title: {
+              display: true,
+              text: "累计用户数：",
+            },
+            responsive: true,// 图表是否响应式
+            legend: {   // 图例
+              display: true,
+            },
+          }
+        })
       },
       updateCanvas () {
         this.pvChart.update()
         this.uvChart.update()
         this.brChart.update()
         this.adChart.update()
+        this.novChart.update()
+        this.svChart.update()
       },
+      /* 时间转化工具 */
+      timeToDay (time) {
+        time = parseInt(time)
+        const date = new Date(time)
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+        return month + '月' + day + '日'
+      },
+      timeToFullString (time) {
+        time = parseInt(time)
+        const date = new Date(time)
+        const year = date.getFullYear()
+        const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+        return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+      },
+      timeToString (time) {
+        time = parseInt(time)
+        const date = new Date(time)
+        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+        return hour + ':' + minute + ':' + second
+      },
+      secondsToMinutes (seconds) {
+        let time = ''
+        seconds = parseInt(seconds)
+        if (seconds > 59) {
+          let minutes = Math.floor(seconds / 60)
+          seconds = seconds % 60
+          time = minutes + `′` + seconds + `″`
+        } else {
+          time = seconds + `″`
+        }
+        return time
+      },
+      /* 获取统计数据 */
+      getStatistics (date) {
+        this.$store.dispatch('getStatistics', date)  // 获取网站指定日期的统计信息
+          .then(res => {
+            switch (date) {
+              case 0:
+                this.statisticsToday = res.statistics
+                break
+              case 1:
+                this.statisticsYesterday = res.statistics
+                break
+            }
+          })
+      },
+      getStatisticsChoose (dayNum) {
+        this.$store.dispatch('getStatistics', dayNum)  // 获取网站指定日期的统计信息
+          .then(res => {
+            this.statisticsChoose = res.statistics
+          })
+      },
+      /* 折线比较图 */
       getCompareData (days) {
         this.$store.dispatch('getCompareData', days)
           .then(res => {
-            this.pvChart.data.datasets[0].data = res.compare.pvData;
-            this.uvChart.data.datasets[0].data = res.compare.uvData;
-            this.brChart.data.datasets[0].data = res.compare.brData;
-            this.adChart.data.datasets[0].data = res.compare.adData;
+            this.pvChart.data.datasets[0].data = res.compare.pvData
+            this.uvChart.data.datasets[0].data = res.compare.uvData
+            this.brChart.data.datasets[0].data = res.compare.brData
+            this.adChart.data.datasets[0].data = res.compare.adData
             this.updateCanvas()
           })
       },
@@ -451,8 +553,24 @@
       },
       toPage (page) {
         this.recordPage = page
+      },
+      /* 新旧访客饼状图 */
+      getONVisitorData (days) {
+        this.$store.dispatch('getONVisitorData', days)
+          .then(res => {
+            this.novChart.data.datasets[0].data = res.onvisitor
+            this.updateCanvas()
+          })
+      },
+      /* 留存分析饼状图 */
+      getSVisitorData (days) {
+        this.$store.dispatch('getSVisitorData',days)
+          .then(res => {
+            this.svChart.data.datasets[0].data = res.svisitor
+            this.svChart.options.title.text = "累计用户数：" + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
+            this.updateCanvas()
+          })
       }
-
     },
     watch: {
       currentWebsite () {
@@ -462,6 +580,8 @@
         this.getCompareData(3)
         this.getLimitRecords(this.recordPage)
         this.getRecordsCount()
+        this.getONVisitorData(1)
+        this.getSVisitorData(30)
       },
       statisticsDate (val) {
         if (val) {
@@ -499,6 +619,17 @@
             this.adChart.data.labels = tmp
             this.getCompareData(7)
             break
+          case '15':  // 切换到近十五天
+            tmp = []
+            for (let i = 14; i > -1; i--) {
+              tmp.push(this.timeToDay(nowDate - oneDayTime * i))
+            }
+            this.pvChart.data.labels = tmp
+            this.uvChart.data.labels = tmp
+            this.brChart.data.labels = tmp
+            this.adChart.data.labels = tmp
+            this.getCompareData(15)
+            break
           case '30':  //切换到近一个月
             tmp = []
             for (let i = 29; i > -1; i--) {
@@ -515,7 +646,13 @@
       },
       recordPage () {
         this.getLimitRecords(this.recordPage)
-      }
+      },
+      visitorDate (val) {
+        this.getONVisitorData(val)
+      },
+      activeDays(val){
+        this.getSVisitorData(val)
+      },
     },
     mounted () {
       this.$emit('routerTo', 1)
@@ -525,6 +662,8 @@
       this.getCompareData(3)
       this.getLimitRecords(1)
       this.getRecordsCount()
+      this.getONVisitorData(1)
+      this.getSVisitorData(30)
     }
   }
 </script>
@@ -532,14 +671,16 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   h1.title {
-    /*margin: 0;*/
-    /*line-height: 50px;*/
+    margin: 20px 0;
     color: #9c9c9c;
     font-size: 26px;
     font-weight: normal;
     font-family: "Arial", sans-serif;
   }
 
+  canvas{
+    background: #e4e4e4;
+  }
   /* 统计表格 */
   table.statistics {
     width: 100%;
@@ -549,7 +690,6 @@
     table-layout: fixed;
   }
 
-  /* 每一列 */
   table.statistics tr td {
     text-align: center;
     overflow: hidden;
@@ -557,13 +697,15 @@
     text-overflow: ellipsis;
   }
 
-  /* 第一列 */
+  /* 每一列 */
+
   table.statistics tr td:nth-child(1) {
     width: 60px;
     border-right: 1px solid rgba(0, 0, 0, .1);
   }
 
-  /* 表头每一行 */
+  /* 第一列 */
+
   table.statistics thead tr {
     line-height: 50px;
     font-size: 14px;
@@ -573,7 +715,8 @@
     background: #f8f8f8;
   }
 
-  /* 表体每一行 */
+  /* 表头每一行 */
+
   table.statistics tbody tr {
     line-height: 40px;
     font-size: 16px;
@@ -581,11 +724,12 @@
     border-bottom: 1px solid rgba(0, 0, 0, .1);
   }
 
+  /* 表体每一行 */
+
   table.statistics tbody tr:last-child {
     border: none;
   }
 
-  /* 表体第一列 */
   table.statistics tbody tr td:nth-child(1) {
     color: #333;
     font-weight: 600;
@@ -593,6 +737,9 @@
     border-right: 1px solid rgba(0, 0, 0, .1);
   }
 
+  /* 表体第一列 */
+
+  /* 指定日期统计 */
   div.statistics-choose {
     position: relative;
     margin: 10px 0;
@@ -626,6 +773,7 @@
     color: #666;
   }
 
+  /* 比较折线图 */
   div.compare {
     position: relative;
   }
@@ -635,9 +783,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 10;
+    z-index: 9;
   }
-
 
   /* 实时访客表格 */
   table.visitor {
@@ -648,7 +795,6 @@
     table-layout: fixed;
   }
 
-  /* 每一列 */
   table.visitor tr td {
     text-align: center;
     overflow: hidden;
@@ -656,12 +802,15 @@
     text-overflow: ellipsis;
   }
 
-  /* 第n列 */
+  /* 每一列 */
+
   table.visitor tr td:nth-child(1) {
     /* + */
     width: 30px;
     border-right: 1px solid rgba(0, 0, 0, .1);
   }
+
+  /* 第n列 */
 
   table.visitor tr td:nth-child(1):hover {
     cursor: pointer;
@@ -698,7 +847,6 @@
     width: 80px;
   }
 
-  /* 表头每一行 */
   table.visitor thead tr {
     line-height: 50px;
     font-size: 14px;
@@ -708,13 +856,16 @@
     background: #f8f8f8;
   }
 
-  /* 表体每一行 */
+  /* 表头每一行 */
+
   table.visitor tbody tr {
     line-height: 40px;
     font-size: 16px;
     color: #606060;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
   }
+
+  /* 表体每一行 */
 
   table.visitor tbody tr:hover {
     background: #eeeaff;
@@ -724,19 +875,20 @@
     border: none;
   }
 
-  /* 表体第一列 */
   table.visitor tbody tr td:nth-child(1) {
     color: #333;
     font-weight: 600;
     font-size: 16px;
   }
 
+  /* 表体第一列 */
+
   div.pagination {
     margin-top: 10px;
     text-align: right;
   }
 
-  /* 弹窗 */
+  /* 记录细节弹窗 */
   div.detail {
     position: fixed;
     width: 600px;
@@ -805,7 +957,6 @@
     width: 100%;
   }
 
-  /* 每一列 */
   div.detail table tr td {
     text-align: left;
     overflow: hidden;
@@ -821,7 +972,6 @@
     width: 84px;
   }
 
-  /* 表头每一行 */
   div.detail table thead tr {
     line-height: 28px;
     font-size: 14px;
@@ -831,14 +981,12 @@
     background: #f8f8f8;
   }
 
-  /* 表体每一行 */
   div.detail table tbody tr {
     line-height: 28px;
     font-size: 14px;
     color: #606060;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
   }
-
 
   div.detail ul {
     margin: 0;
@@ -866,5 +1014,38 @@
     margin-top: 10px;
     float: left;
     width: 50%;
+  }
+
+  /* 新旧访客分析 */
+  h2.title{
+    line-height: 40px;
+    margin: 0;
+    padding: 0;
+    color: #9c9c9c;
+    font-size: 24px;
+    font-weight: normal;
+    font-family: "微软雅黑", sans-serif;
+  }
+  div.new-old-visitor{
+    position: relative;
+    width: 50%;
+    float: left;
+  }
+  div.new-old-visitor .visitor-select {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+  }
+  div.stay-visitor{
+    position: relative;
+    width: 50%;
+    float: left;
+  }
+  div.stay-visitor .visitor-input{
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
   }
 </style>
