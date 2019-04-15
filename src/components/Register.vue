@@ -20,7 +20,7 @@
       <span class="msg">{{emlMsg}}</span>
     </div>
     <a class="register-btn" @click="register" href="javascript:void(0)">注册</a>
-    <p class="message">&nbsp;{{message}}&nbsp;</p>
+    <div class="message" v-loading="loading">{{message}}</div>
   </div>
 </template>
 
@@ -41,7 +41,8 @@
         email: '',
         emlMsg: '',
 
-        message: ''
+        message: '',
+        loading: false
       }
     },
     methods: {
@@ -108,7 +109,7 @@
           this.$store.dispatch('validateUsername', this.username)
             .then(res => {
               this.usrMsg = '✔'
-              this.message = '注册中...'
+              this.loading = true
               return this.$store.dispatch('register', registerInfo)
             })
             .then(res => {
@@ -122,9 +123,11 @@
             })
             .catch(err => {
               this.usrMsg = err.message || '×'
+              this.loading = false
             })
             .catch(err => {
               this.message = err.message || ''
+              this.loading = false
             })
         }
       }
@@ -221,12 +224,14 @@
     border-radius: 8px;
   }
 
-  a.register-btn + p.message {
+  a.register-btn + div.message {
+    width: 100%;
+    height: 50px;
     color: darkred;
     font-weight: bold;
     font-size: 14px;
-    left: 330px;
-    top: 18px;
+    line-height: 50px;
+    text-align: center;
   }
 
 </style>

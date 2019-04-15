@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <div v-if="isAddWebsite" class="add">
       <div class="add-wrap ">
         <div class="title"><span>新增网站</span><span @click="hideAddWebsite">&times</span></div>
@@ -8,15 +8,18 @@
           <input type="text" id="hostIpt" placeholder="请输入网站域名" v-model="hostIpt">
         </div>
         <div class="describe">
-          <p>可输入如下4种域名形式：</p>
-          <p>1. 主域名（如：www.baidu.com）</p>
-          <p>2. 二级域名（如：sub.baidu.com）</p>
-          <p>3. 子目录（如：www.baidu.com/sub）</p>
-          <p>4. wap站域名（如：wap.baidu.com)</p>
+          <p>1. jessezhu.cn 或 jessezhu.cn:8080</p>
+          <p>2. www.jessezhu.cn 或 www.jessezhu.cn:8080</p>
+          <p>3. analytics.jessezhu.cn 或 analytics.jessezhu.cn:8080</p>
         </div>
         <div class="input">
           <label for="indexIpt">网站首页</label>
           <input type="text" id="indexIpt" placeholder="请输入网站首页" v-model="indexIpt">
+        </div>
+        <div class="describe">
+          <p>1. http://www.jessezhu.cn 或 http://www.jessezhu.cn/</p>
+          <p>2. http://www.jessezhu.cn/index.html</p>
+          <p>3. https://www.jessezhu.cn 或 https://www.jessezhu.cn/</p>
         </div>
         <div class="input">
           <label for="titleIpt">网站名称</label>
@@ -50,7 +53,7 @@
           <td>网站域名</td>
           <td>网站名称</td>
           <td>网站首页</td>
-          <td>代码状态</td>
+          <td>代码安装状态</td>
           <td>操作</td>
         </tr>
         </thead>
@@ -59,7 +62,10 @@
           <td>{{website.host}}</td>
           <td>{{website.title}}</td>
           <td>{{website.index_url}}</td>
-          <td>{{checkRes[index]}}<a href="javascript:void(0)" @click="checkCode(website)">检查</a></td>
+          <td v-loading="!checkLoading[index]">
+            <span :style="{color: checkRes[index]==='✖'?'darkred':'limegreen'}">{{checkRes[index]}}</span>
+            <a href="javascript:void(0)" @click="checkCode(website,index)" title="刷新"><i class="fa fa-refresh"></i></a>
+          </td>
           <td><a href="javascript:void(0)" @click="setCode(website.config),showGetCode()">获取代码</a></td>
         </tr>
         </tbody>
@@ -76,6 +82,7 @@
     name: 'Manage',
     data () {
       return {
+        loading: false,
         hostIpt: '',
         indexIpt: '',
         titleIpt: '',
@@ -83,11 +90,38 @@
         isGetCode: false,
         code: ``,
         copyRes: '',
-        checkRes: []
+        checkRes: [],
+        checkLoading: []
       }
     },
     computed: mapState(['websites']),
     methods: {
+      validateHost (val) {
+        const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+        if (reg.test(val)) {
+          return true
+        } else {
+          this.$emit('addNotification', '域名格式不正确', '请输入正确的域名')
+          return false
+        }
+      },
+      validateIndex (val) {
+        const reg = /^(?=^.{3,255}$)http(s)?:\/\/?(www\.)?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:\d+)*(\/\w+\.\w+)*([\?&]\w+=\w*)*$/
+        if (reg.test(val)) {
+          return true
+        } else {
+          this.$emit('addNotification', '首页地址格式不正确', '请输入正确的首页地址')
+          return false
+        }
+      },
+      validateTitle (val) {
+        if (val.length <= 10) {
+          return true
+        } else {
+          this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过10')
+          return false
+        }
+      },
       showAddWebsite () {
         this.isAddWebsite = true
       },
@@ -95,24 +129,30 @@
         this.isAddWebsite = false
       },
       submitAddWebsite () {
-        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt, title: this.titleIpt}
-        this.$store.dispatch('addWebsite', submitInfo)
-          .then(res => {
-            this.isAddWebsite = false
-            const websites = this.websites
-            websites.push(res.website)
-            this.$store.commit('setWebsites', websites)
-            if (websites.length === 1) {
-              this.$store.commit('setCurrentWebsite', websites[0])
-            }
-            this.hostIpt = ''
-            this.indexIpt = ''
-          })
-          .catch(() => {
-            alert('添加失败')
-          })
+        if (this.validateHost(this.hostIpt) && this.validateIndex(this.indexIpt) && this.validateTitle(this.titleIpt)) {
+          this.loading = true
+          const submitInfo = {host: this.hostIpt, index_url: this.indexIpt, title: this.titleIpt}
+          this.$store.dispatch('addWebsite', submitInfo)
+            .then(res => {
+              this.loading = false
+              this.isAddWebsite = false
+              const websites = this.websites
+              websites.push(res.website)
+              this.$store.commit('setWebsites', websites)
+              if (websites.length === 1) {
+                this.$store.commit('setCurrentWebsite', websites[0])
+              }
+              this.hostIpt = ''
+              this.indexIpt = ''
+              this.titleIpt = ''
+              this.$emit('addNotification', '成功', '添加成功')
+            })
+            .catch(() => {
+              this.loading = false
+              this.$emit('addNotification', '错误', '添加失败')
+            })
+        }
       },
-
       setCode (config) {
         this.code = waCode(config)
       },
@@ -132,17 +172,40 @@
           this.copyRes = '复制失败，请手动复制'
         }
       },
-
-      checkCode (website) {
+      checkAllCode () {
+        for (let i in this.websites) {
+          this.$store.dispatch('validateSite', this.websites[i].id)
+            .then(res => {
+              this.$set(this.checkRes, i, '✔')
+              this.$set(this.checkLoading, i, true)
+            })
+            .catch(err => {
+              this.$set(this.checkRes, i, '✖')
+              this.$set(this.checkLoading, i, true)
+            })
+        }
+      },
+      checkCode (website, index) {
+        this.$set(this.checkLoading, index, false)
         this.$store.dispatch('validateSite', website.id)
           .then(res => {
-            alert(res.message)
+            this.$set(this.checkLoading, index, true)
+            this.$set(this.checkRes, index, '✔')
           })
-          .catch(err => alert('未检测到代码'))
+          .catch(err => {
+            this.$set(this.checkLoading, index, true)
+            this.$set(this.checkRes, index, '✖')
+          })
+      }
+    },
+    watch: {
+      websites () {
+        this.checkAllCode()
       }
     },
     mounted () {
       this.$emit('routerTo', 3)
+      this.checkAllCode()
     }
   }
 </script>
@@ -201,7 +264,7 @@
 
   table.manage tr td:nth-child(4) {
     /* 代码状态 */
-    width: 64px;
+    width: 128px;
   }
 
   table.manage tr td:nth-child(4) a {
@@ -235,10 +298,6 @@
     font-size: 16px;
     color: #606060;
     border-bottom: 1px solid rgba(0, 0, 0, .1);
-  }
-
-  table.manage tbody tr:hover {
-    background: #eeeaff;
   }
 
   table.manage tbody tr:last-child {
@@ -275,7 +334,8 @@
     margin-right: 10px;
     font-size: 14px;
   }
-  div.button button:hover{
+
+  div.button button:hover {
     cursor: pointer;
   }
 
@@ -351,6 +411,7 @@
     font-size: 15px;
     color: #666;
   }
+
   div.add-wrap .input {
     display: flex;
     flex-flow: row nowrap;
@@ -406,7 +467,8 @@
     background: #fff;
     resize: none;
   }
-  div.code-wrap .code-content textarea:focus{
+
+  div.code-wrap .code-content textarea:focus {
     border: 1px solid #ff736b;
   }
 

@@ -2,7 +2,7 @@
   <div>
     <!--今昨日统计数据-->
     <h1 class="title">统计信息</h1>
-    <table class="statistics">
+    <table class="statistics" v-loading="statisticsLoading">
       <thead>
       <tr>
         <td></td>
@@ -37,7 +37,7 @@
         type="date"
         placeholder="选择日期">
       </el-date-picker>
-      <div class="choose-result clear">
+      <div class="choose-result clear" v-loading="statisticsChooseLoading">
         <div>浏览量PV：<span>{{ statisticsChoose.pv }}</span></div>
         <div>流量UV：<span>{{ statisticsChoose.uv }}</span></div>
         <div>跳出率：<span>{{ statisticsChoose.br }}</span></div>
@@ -45,10 +45,10 @@
       </div>
     </div>
     <!--pv uv br ad的折线图比较-->
-    <div class="compare">
+    <div class="compare" v-loading="compareLoading">
       <el-tabs v-model="activeName">
         <el-tab-pane label="浏览量PV/次" name="pv">
-          <canvas id="pvCanvas" width="400" height="100">
+          <canvas id="pvCanvas" width="400" height="100" >
             <p>Canvas</p>
           </canvas>
         </el-tab-pane>
@@ -79,7 +79,7 @@
     </div>
     <!--实时访客数据-->
     <h1 class="title">实时访客</h1>
-    <table class="visitor">
+    <table class="visitor" v-loading="visitorLoading">
       <thead>
       <tr>
         <td></td>
@@ -115,7 +115,7 @@
     </el-pagination>
     <div class="detail" v-show="isDetail">
       <div class="title"><span>详细信息</span><span @click="hideDetail">&times</span></div>
-      <div class="content clear">
+      <div class="content clear" v-loading="detailLoading">
         <div class="history">
           <h3>访问记录</h3>
           <table>
@@ -156,12 +156,11 @@
           </ul>
         </div>
       </div>
-
     </div>
     <!--访客分析-->
     <div class="clear">
       <!--新旧访客分析-->
-      <div class="new-old-visitor">
+      <div class="new-old-visitor" v-loading="nosLoading">
         <h1 class="title">新旧访客</h1>
         <div class="visitor-select">
           <el-select v-model="visitorDate">
@@ -178,7 +177,7 @@
         </canvas>
       </div>
       <!-- 留存分析-->
-      <div class="stay-visitor">
+      <div class="stay-visitor"  v-loading="stayLoading">
         <h1 class="title">留存分析</h1>
         <div class="visitor-input">
           <el-input-number v-model="activeDays" :precision="0" :step="15" :min="7" :max="90" label="描述文字"></el-input-number>
@@ -207,11 +206,14 @@
     data () {
       return {
         /* 今日昨日指定日的统计数据 */
+        statisticsLoading: true,
         statisticsToday: {},
         statisticsYesterday: {},
+        statisticsChooseLoading: false,
         statisticsChoose: {pv: '-', uv: '-', br: '-', ad: '-'},
         statisticsDate: null,  // 选择的日期
         /* 比较折线图 */
+        compareLoading: true,
         activeName: 'pv',  // 选择要比较的属性
         compareDate: '3',
         compareOptions: [{
@@ -233,6 +235,7 @@
         adChart: null,
         compareLabel: ['前天', '昨天', '今天'],
         /* 实时访客记录 */
+        visitorLoading: true,
         records: [],
         recordsCount: 0,
         recordPage: 1,
@@ -240,7 +243,9 @@
         ipIsOld: false,
         ipThatDayVisit: 0,
         isDetail: false,
+        detailLoading: true,
         /* 新旧访客饼状图 */
+        nosLoading: true,
         visitorDate: '1',
         visitorOptions: [{
           value: '1',
@@ -257,6 +262,7 @@
         }],
         novChart: null,
         /* 留存分析饼状图 */
+        stayLoading: true,
         activeDays: 30,
         svChart: null,
       }
@@ -494,29 +500,32 @@
         return time
       },
       /* 获取统计数据 */
-      getStatistics (date) {
-        this.$store.dispatch('getStatistics', date)  // 获取网站指定日期的统计信息
+      getStatistics () {
+        this.statisticsLoading = true
+        this.$store.dispatch('getStatistics', 0)  // 获取网站指定日期的统计信息
           .then(res => {
-            switch (date) {
-              case 0:
-                this.statisticsToday = res.statistics
-                break
-              case 1:
-                this.statisticsYesterday = res.statistics
-                break
-            }
+            this.statisticsToday = res.statistics
+            return this.$store.dispatch('getStatistics', 1)
+          })
+          .then(res=>{
+            this.statisticsYesterday = res.statistics
+            this.statisticsLoading = false
           })
       },
       getStatisticsChoose (dayNum) {
+        this.statisticsChooseLoading = true
         this.$store.dispatch('getStatistics', dayNum)  // 获取网站指定日期的统计信息
           .then(res => {
+            this.statisticsChooseLoading = false
             this.statisticsChoose = res.statistics
           })
       },
       /* 折线比较图 */
       getCompareData (days) {
+        this.compareLoading = true
         this.$store.dispatch('getCompareData', days)
           .then(res => {
+            this.compareLoading = false
             this.pvChart.data.datasets[0].data = res.compare.pvData
             this.uvChart.data.datasets[0].data = res.compare.uvData
             this.brChart.data.datasets[0].data = res.compare.brData
@@ -526,8 +535,12 @@
       },
       /* 实时访客记录 */
       getLimitRecords (page) {
+        this.visitorLoading = true
         this.$store.dispatch('getLimitRecords', page)
-          .then(res => this.records = res.records)
+          .then(res => {
+            this.visitorLoading = false
+            this.records = res.records
+          })
       },
       getRecordsCount () {
         this.$store.dispatch('getRecordsCount')
@@ -536,8 +549,10 @@
       showDetail (record) {
         this.recordDetail = record
         this.isDetail = true
+        this.detailLoading = true
         this.$store.dispatch('getRecordMore', record.id)
           .then(res => {
+            this.detailLoading = false
             this.ipIsOld = res.isOld
             this.ipThatDayVisit = res.thatDayVisit
           })
@@ -556,16 +571,20 @@
       },
       /* 新旧访客饼状图 */
       getONVisitorData (days) {
+        this.nosLoading = true
         this.$store.dispatch('getONVisitorData', days)
           .then(res => {
+            this.nosLoading = false
             this.novChart.data.datasets[0].data = res.onvisitor
             this.updateCanvas()
           })
       },
       /* 留存分析饼状图 */
       getSVisitorData (days) {
+        this.stayLoading = true
         this.$store.dispatch('getSVisitorData',days)
           .then(res => {
+            this.stayLoading = false
             this.svChart.data.datasets[0].data = res.svisitor
             this.svChart.options.title.text = "累计用户数：" + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
             this.updateCanvas()
@@ -574,9 +593,7 @@
     },
     watch: {
       currentWebsite () {
-        this.getStatistics(0)
-        this.getStatistics(1)
-        this.drawCanvas()
+        this.getStatistics()
         this.getCompareData(3)
         this.getLimitRecords(this.recordPage)
         this.getRecordsCount()
@@ -656,8 +673,7 @@
     },
     mounted () {
       this.$emit('routerTo', 1)
-      this.getStatistics(0)
-      this.getStatistics(1)
+      this.getStatistics()
       this.drawCanvas()
       this.getCompareData(3)
       this.getLimitRecords(1)

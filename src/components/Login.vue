@@ -10,7 +10,7 @@
       <input v-model="password" @keyup.enter="login" type="password" id="pswIpt"/>
     </div>
     <a class="login-btn" @click="login" href="javascript:void(0)">登录</a>
-    <p class="message">&nbsp;{{message}}&nbsp;</p>
+    <div class="message" v-loading="loading">{{message}}</div>
   </div>
 </template>
 
@@ -22,14 +22,15 @@
       return {
         username: '',
         password: '',
-        message: ''
+        message: '',
+        loading: false
       }
     },
     computed: {},
     methods: {
       login () {
         if (this.username && this.password) {
-          this.message = '登录中...'
+          this.loading = true
           const loginInfo = {
             username: this.username,
             password: this.password
@@ -43,9 +44,11 @@
                   this.$store.commit('setCurrentWebsite', res.websites[0])
                 })
               this.$emit('routerTo', 0)
+              this.loading = false
             })
             .catch(err => {
               this.message = err.message
+              this.loading = false
             })
         }
       }
@@ -89,11 +92,11 @@
     display: inline-block;
     padding: 2px 10px;
     line-height: 20px;
-    width:200px;
+    width: 200px;
     color: #777777;
   }
 
-  a.login-btn{
+  a.login-btn {
     text-decoration: none;
     color: #fff;
     font-weight: bold;
@@ -102,11 +105,14 @@
     padding: 10px 15px;
     border-radius: 8px;
   }
-  a.login-btn + p.message{
+
+  a.login-btn + div.message {
+    width: 100%;
+    height: 50px;
     color: darkred;
     font-weight: bold;
     font-size: 14px;
-    left: 330px;
-    top: 18px;
+    line-height: 50px;
+    text-align: center;
   }
 </style>

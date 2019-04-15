@@ -2,7 +2,7 @@
   <div>
     <div v-if="user">
       <h1 class="title">网站总览</h1>
-      <table class="overview">
+      <table class="overview" v-loading="loading">
         <thead>
         <tr>
           <td>网站名称</td>
@@ -41,7 +41,8 @@
     name: 'Home',
     data () {
       return {
-        overview: []
+        overview: [],
+        loading: true
       }
     },
     computed: {
@@ -51,7 +52,10 @@
     methods: {
       getOverview () {
         this.$store.dispatch('getOverview')
-          .then(res => { this.overview = res.overview })
+          .then(res => {
+            this.loading = false
+            this.overview = res.overview
+          })
       },
       toAnalytics (website) {
         this.$store.commit('setCurrentWebsite', website)

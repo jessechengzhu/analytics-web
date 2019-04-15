@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="nav nav-right">
-        <div class="user" v-if="isLogin&&user">
+        <div class="user" v-if="user">
           <div class="user-avatar" @click="toggleUserOperation">
             <i class="fa fa-user-circle-o"></i>&nbsp;{{user.username}}&nbsp;<i class="fa fa-lg"
                                                                                :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
@@ -49,6 +49,7 @@
       </div>
       <router-view class="main-wrap"
                    @routerTo="routerTo"
+                   @addNotification="addNotification"
       />
     </div>
   </div>
@@ -70,8 +71,15 @@
         chooseM: false,
       }
     },
-    computed: mapState(['isLogin', 'user', 'websites', 'currentWebsite']),
+    computed: mapState(['user', 'websites', 'currentWebsite']),
     methods: {
+      addNotification(title,message){
+        const h = this.$createElement;
+        this.$notify({
+          title: title,
+          message: h('i', { style: 'color: teal'},message)
+        });
+      },
       logout () {
         this.showUserOperation = false
         this.showSelect = false
@@ -90,7 +98,7 @@
         let currentWebsite = JSON.parse(sessionStorage.getItem('website'))
         if (currentWebsite) {
           this.$store.commit('setCurrentWebsite', currentWebsite)
-        } else if (this.websites.length !== 0) {
+        } else if (this.websites&&this.websites.length !== 0) {
           this.$store.commit('setCurrentWebsite', this.websites[0])
         }
         sessionStorage.removeItem('website')
@@ -188,6 +196,9 @@
 </script>
 
 <style>
+  .el-notification{
+    z-index: 9000!important;
+  }
 
   .clear:before {
     content: '';
@@ -226,7 +237,7 @@
     min-width: 1300px;
     background: linear-gradient(90deg, #6982e7, #e791bb);
     color: #fff;
-    z-index: 10;
+    z-index: 5000;
   }
 
   div.header .nav {

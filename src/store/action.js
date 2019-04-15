@@ -26,14 +26,12 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(response.data) // 自定义错误
   }
 }, function (error) {
-  if (error.response.data.message === 'jwt expired') { // 身份过期错误
+  if (error.response && error.response.data.message === 'jwt expired') { // 身份过期错误
     console.log('身份过期，请重新登录')
     store.commit('clearUser')
     router.push('/login')
-    // history.go(0)
-    return Promise.resolve(error.response.data)
   } else { // 普通错误
-    return error.response.data
+    return Promise.reject(error.response ? error.response.data : {message: '未知错误'})
   }
 })
 
