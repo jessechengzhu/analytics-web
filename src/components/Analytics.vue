@@ -48,7 +48,7 @@
     <div class="compare" v-loading="compareLoading">
       <el-tabs v-model="activeName">
         <el-tab-pane label="浏览量PV/次" name="pv">
-          <canvas id="pvCanvas" width="400" height="100" >
+          <canvas id="pvCanvas" width="400" height="100">
             <p>Canvas</p>
           </canvas>
         </el-tab-pane>
@@ -177,11 +177,12 @@
         </canvas>
       </div>
       <!-- 留存分析-->
-      <div class="stay-visitor"  v-loading="stayLoading">
+      <div class="stay-visitor" v-loading="stayLoading">
         <h1 class="title">留存分析</h1>
         <div class="visitor-input">
-          <el-input-number v-model="activeDays" :precision="0" :step="15" :min="7" :max="90" label="描述文字"></el-input-number>
-          <el-tooltip class="item" effect="dark" placement="right" >
+          <el-input-number v-model="activeDays" :precision="0" :step="15" :min="7" :max="90"
+                           label="描述文字"></el-input-number>
+          <el-tooltip class="item" effect="dark" placement="right">
             <div slot="content">-设置流失标准-<br/><br/>你可以在此设置<br/>多少天未访问的<br/>用户为流失用户<br/>最小为7天<br/>最大为90天</div>
             <el-button><i class="fa fa-question-circle"></i></el-button>
           </el-tooltip>
@@ -193,7 +194,8 @@
       <!--地域分析-->
       <div class="region-visitor"></div>
     </div>
-    <p class="footer">&copy;Jesse Zhu&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/" target="_blank">苏ICP备19002725号</a></p>
+    <p class="footer">&copy;Jesse Zhu&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"
+                                                    target="_blank">苏ICP备19002725号</a></p>
   </div>
 </template>
 
@@ -225,7 +227,7 @@
         }, {
           value: '15',
           label: '近十五天'
-        },{
+        }, {
           value: '30',
           label: '近一个月'
         }],
@@ -268,7 +270,7 @@
       }
     },
     computed: {
-      ...mapState(['currentWebsite']),
+      ...mapState(['currentWebsite','websites']),
       getOpenTime () {
         return function (openTime, index) {
           if (index === 0) {
@@ -434,8 +436,8 @@
           data: {
             labels: ['活跃用户', '沉默用户', '流失用户'],
             datasets: [{
-              data: [10, 10 ,10],
-              backgroundColor: ['rgb(255,70,48)', 'rgb(202,122,255)','rgb(80,80,80)'],
+              data: [10, 10, 10],
+              backgroundColor: ['rgb(255,70,48)', 'rgb(202,122,255)', 'rgb(80,80,80)'],
               borderColor: 'rgb(255,255,255)',
               borderWidth: 3
             }],
@@ -443,7 +445,7 @@
           options: {
             title: {
               display: true,
-              text: "累计用户数：",
+              text: '累计用户数：',
             },
             responsive: true,// 图表是否响应式
             legend: {   // 图例
@@ -507,10 +509,12 @@
             this.statisticsToday = res.statistics
             return this.$store.dispatch('getStatistics', 1)
           })
-          .then(res=>{
+          .then(res => {
             this.statisticsYesterday = res.statistics
             this.statisticsLoading = false
           })
+          .catch(err => {})
+          .catch(err => {})
       },
       getStatisticsChoose (dayNum) {
         this.statisticsChooseLoading = true
@@ -519,6 +523,7 @@
             this.statisticsChooseLoading = false
             this.statisticsChoose = res.statistics
           })
+          .catch(err => {})
       },
       /* 折线比较图 */
       getCompareData (days) {
@@ -532,6 +537,7 @@
             this.adChart.data.datasets[0].data = res.compare.adData
             this.updateCanvas()
           })
+          .catch(err => {})
       },
       /* 实时访客记录 */
       getLimitRecords (page) {
@@ -541,10 +547,12 @@
             this.visitorLoading = false
             this.records = res.records
           })
+          .catch(err => {})
       },
       getRecordsCount () {
         this.$store.dispatch('getRecordsCount')
           .then(res => this.recordsCount = res.count)
+          .catch(err => {})
       },
       showDetail (record) {
         this.recordDetail = record
@@ -556,6 +564,7 @@
             this.ipIsOld = res.isOld
             this.ipThatDayVisit = res.thatDayVisit
           })
+          .catch(err => {})
       },
       hideDetail () {
         this.isDetail = false
@@ -578,17 +587,19 @@
             this.novChart.data.datasets[0].data = res.onvisitor
             this.updateCanvas()
           })
+          .catch(err => {})
       },
       /* 留存分析饼状图 */
       getSVisitorData (days) {
         this.stayLoading = true
-        this.$store.dispatch('getSVisitorData',days)
+        this.$store.dispatch('getSVisitorData', days)
           .then(res => {
             this.stayLoading = false
             this.svChart.data.datasets[0].data = res.svisitor
-            this.svChart.options.title.text = "累计用户数：" + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
+            this.svChart.options.title.text = '累计用户数：' + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
             this.updateCanvas()
           })
+          .catch(err => {})
       }
     },
     watch: {
@@ -667,11 +678,18 @@
       visitorDate (val) {
         this.getONVisitorData(val)
       },
-      activeDays(val){
+      activeDays (val) {
         this.getSVisitorData(val)
       },
     },
     mounted () {
+      if(!this.currentWebsite){
+        if (this.websites.length!==0){
+          this.$store.commit('setCurrentWebsite',this.websites[0])
+        } else {
+          this.$router.push('/manage')
+        }
+      }
       this.$emit('routerTo', 1)
       this.getStatistics()
       this.drawCanvas()
@@ -690,13 +708,15 @@
     margin: 20px 0;
     color: #9c9c9c;
     font-size: 26px;
+    line-height: 36px;
     font-weight: normal;
     font-family: "Arial", sans-serif;
   }
 
-  canvas{
+  canvas {
     background: #e4e4e4;
   }
+
   /* 统计表格 */
   table.statistics {
     width: 100%;
@@ -1033,32 +1053,26 @@
   }
 
   /* 新旧访客分析 */
-  h2.title{
-    line-height: 40px;
-    margin: 0;
-    padding: 0;
-    color: #9c9c9c;
-    font-size: 24px;
-    font-weight: normal;
-    font-family: "微软雅黑", sans-serif;
-  }
-  div.new-old-visitor{
+  div.new-old-visitor {
     position: relative;
     width: 50%;
     float: left;
   }
+
   div.new-old-visitor .visitor-select {
     position: absolute;
     top: 20px;
     width: 100%;
     text-align: center;
   }
-  div.stay-visitor{
+
+  div.stay-visitor {
     position: relative;
     width: 50%;
     float: left;
   }
-  div.stay-visitor .visitor-input{
+
+  div.stay-visitor .visitor-input {
     position: absolute;
     top: 20px;
     width: 100%;

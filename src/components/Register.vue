@@ -167,7 +167,9 @@
   }
 
   h1.title {
+    margin: 20px 0;
     color: #9c9c9c;
+    line-height: 36px;
     font-size: 26px;
     font-weight: normal;
     font-family: "Arial", sans-serif;

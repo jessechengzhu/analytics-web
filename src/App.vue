@@ -89,10 +89,13 @@
       },
       getUser () {
         this.$store.dispatch('getUser')
+          .then(()=>{})
+          .catch(()=>{})
       },
       getWebsites () {
         this.$store.dispatch('getWebsites')
           .then(() => {this.loadSessionStorage()})
+          .catch(()=>{})
       },
       loadSessionStorage () {
         let currentWebsite = JSON.parse(sessionStorage.getItem('website'))
@@ -107,6 +110,7 @@
         this.showSelect = !this.showSelect
       },
       toggleUserOperation () {
+        waTag('event','link','click','toggleUserOperation','true')
         this.showUserOperation = !this.showUserOperation
       },
       routerTo (num) {
@@ -180,8 +184,10 @@
       },
       /* 用于监听刷新页面后vuex数据丢失问题 */
       currentWebsite (website) {
-        if (this.chooseC || this.chooseA) {
+        if (website && (this.chooseC || this.chooseA)) {
           this.selectInfo = '当前选择：' + website.host
+        }else {
+          this.selectInfo = '全部网站数据'
         }
       }
     },
@@ -398,6 +404,8 @@
     box-sizing: border-box;
     box-shadow: 1px 0 rgba(0, 0, 0, 0.1);
     height: 100%;
+    z-index: 4000;
+    background: #fff;
   }
 
   div.main .side-bar {

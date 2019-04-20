@@ -6,7 +6,7 @@ export default {
     state.user = null
     state.websites = []
     state.currentWebsite = null
-    localStorage.setItem('token', '')
+    localStorage.removeItem('token')
   },
   setWebsites (state, websites) {
     state.websites = websites

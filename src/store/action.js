@@ -22,17 +22,16 @@ axios.interceptors.request.use(function (config) {
 axios.interceptors.response.use(function (response) {
   if (response.data.status === 2) {
     return response.data
-  } else {
-    return Promise.reject(response.data) // 自定义错误
-  }
-}, function (error) {
-  if (error.response && error.response.data.message === 'jwt expired') { // 身份过期错误
-    console.log('身份过期，请重新登录')
+  } else if (response.data.message === 'jwt expired') { // 身份过期错误
+    // console.log('身份过期，请重新登录')
     store.commit('clearUser')
     router.push('/login')
-  } else { // 普通错误
-    return Promise.reject(error.response ? error.response.data : {message: '未知错误'})
+    return Promise.reject(response.data)
+  } else { // 自定义错误
+    return Promise.reject(response.data)
   }
+}, function (error) {
+  return Promise.reject(error.response ? error.response.data : {message: '内部错误'})
 })
 
 export default {
@@ -45,7 +44,6 @@ export default {
         })
         .catch(() => { // 获取失败了，清除这个无效token
           commit('clearUser')
-          localStorage.removeItem('token')
         })
     }
   },
@@ -139,6 +137,9 @@ export default {
       if (localStorage.getItem('token')) {
         axios.get('/api/websites/overview')
           .then(res => resolve(res))
+          .catch(err => {
+            reject(err)
+          })
       }
     })
   },
@@ -231,6 +232,41 @@ export default {
             reject(err)
           })
       }
+    })
+  },
+  getEventData ({state}, days) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/event/' + state.currentWebsite.config + '?days=' + days)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
+  editWebsite ({state}, website) {
+    return new Promise((resolve, reject) => {
+      axios.put('/api/websites/website', website)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  },
+  deleteWebsite ({state}, config) {
+    return new Promise((resolve, reject) => {
+      axios.delete('/api/websites/website/' + config)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
     })
   }
 }

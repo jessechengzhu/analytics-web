@@ -43,6 +43,7 @@
                 .then(res => {
                   this.$store.commit('setCurrentWebsite', res.websites[0])
                 })
+                .catch(err=>{})
               this.$emit('routerTo', 0)
               this.loading = false
             })
@@ -69,7 +70,9 @@
   }
 
   h1.title {
+    margin: 20px 0;
     color: #9c9c9c;
+    line-height: 36px;
     font-size: 26px;
     font-weight: normal;
     font-family: "Arial", sans-serif;
@@ -90,9 +93,10 @@
 
   div.input input {
     display: inline-block;
-    padding: 2px 10px;
-    line-height: 20px;
+    padding-left: 10px;
+    padding-right: 26px;
     width: 200px;
+    height: 30px;
     color: #777777;
   }
 

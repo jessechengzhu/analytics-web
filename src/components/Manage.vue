@@ -1,8 +1,8 @@
 <template>
-  <div v-loading="loading">
+  <div>
     <div v-if="isAddWebsite" class="add">
       <div class="add-wrap ">
-        <div class="title"><span>新增网站</span><span @click="hideAddWebsite">&times</span></div>
+        <div class="title"><span>新增网站</span><span @click="isAddWebsite = false">&times</span></div>
         <div class="input">
           <label for="hostIpt">网站域名</label>
           <input type="text" id="hostIpt" placeholder="请输入网站域名" v-model="hostIpt">
@@ -17,9 +17,9 @@
           <input type="text" id="indexIpt" placeholder="请输入网站首页" v-model="indexIpt">
         </div>
         <div class="describe">
-          <p>1. http://www.jessezhu.cn 或 http://www.jessezhu.cn/</p>
+          <p>1. http://www.jessezhu.cn</p>
           <p>2. http://www.jessezhu.cn/index.html</p>
-          <p>3. https://www.jessezhu.cn 或 https://www.jessezhu.cn/</p>
+          <p>3. https://www.jessezhu.cn</p>
         </div>
         <div class="input">
           <label for="titleIpt">网站名称</label>
@@ -27,7 +27,38 @@
         </div>
         <div class="button">
           <button class="sure" @click="submitAddWebsite">确定</button>
-          <button class="cancel" @click="hideAddWebsite">取消</button>
+          <button class="cancel" @click="isAddWebsite = false">取消</button>
+        </div>
+      </div>
+    </div>
+    <div v-if="isEditWebsite" class="edit">
+      <div class="edit-wrap ">
+        <div class="title"><span>修改网站</span><span @click="isEditWebsite = false">&times</span></div>
+        <div class="input">
+          <label for="editHostIpt">网站域名</label>
+          <input type="text" id="editHostIpt" placeholder="请输入新网站域名" v-model="editHostIpt">
+        </div>
+        <div class="describe">
+          <p>1. jessezhu.cn 或 jessezhu.cn:8080</p>
+          <p>2. www.jessezhu.cn 或 www.jessezhu.cn:8080</p>
+          <p>3. analytics.jessezhu.cn 或 analytics.jessezhu.cn:8080</p>
+        </div>
+        <div class="input">
+          <label for="editIndexIpt">网站首页</label>
+          <input type="text" id="editIndexIpt" placeholder="请输入网站首页" v-model="editIndexIpt">
+        </div>
+        <div class="describe">
+          <p>1. http://www.jessezhu.cn</p>
+          <p>2. http://www.jessezhu.cn/index.html</p>
+          <p>3. https://www.jessezhu.cn</p>
+        </div>
+        <div class="input">
+          <label for="editTitleIpt">网站名称</label>
+          <input type="text" id="editTitleIpt" placeholder="请输入网站名称" v-model="editTitleIpt">
+        </div>
+        <div class="button">
+          <button class="sure" @click="submitEditWebsite">确定</button>
+          <button class="cancel" @click="isEditWebsite = false">取消</button>
         </div>
       </div>
     </div>
@@ -44,8 +75,8 @@
         </div>
       </div>
     </div>
-    <div>
-      <h1 class="title">网站管理<a href="javascript:void(0)" @click="showAddWebsite" class="add-btn">新增网站</a>
+    <div v-loading="loading">
+      <h1 class="title">网站管理<a href="javascript:void(0)" @click="isAddWebsite = true" class="add-btn">新增网站</a>
       </h1>
       <table class="manage">
         <thead>
@@ -65,11 +96,23 @@
           <td v-loading="!checkLoading[index]">
             <span :style="{color: checkRes[index]==='✖'?'darkred':'limegreen'}">{{checkRes[index]}}</span>
             <a href="javascript:void(0)" @click="checkCode(website,index)" title="刷新"><i class="fa fa-refresh"></i></a>
+            <a href="javascript:void(0)" @click="setCode(website.config),showGetCode()">获取代码</a>
           </td>
-          <td><a href="javascript:void(0)" @click="setCode(website.config),showGetCode()">获取代码</a></td>
+          <td>
+            <el-button
+              size="mini"
+              @click="showEdit(website)">编辑
+            </el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              @click="showDelete(website)">删除
+            </el-button>
+          </td>
         </tr>
         </tbody>
       </table>
+      <p v-if="websites.length===0" style="text-align: center">你还没有添加网站，<a href="javascript:void(0);" @click="isAddWebsite=true">添加</a>以查看我的网站分析。</p>
     </div>
   </div>
 </template>
@@ -91,10 +134,18 @@
         code: ``,
         copyRes: '',
         checkRes: [],
-        checkLoading: []
+        checkLoading: [],
+        /* 修改网站 */
+        tmpWebsite: null,
+        tmpId: 0,
+        editHostIpt: '',
+        editIndexIpt: '',
+        editTitleIpt: '',
+        isEditWebsite: false,
+        isDeleteWebsite: false,
       }
     },
-    computed: mapState(['websites']),
+    computed: mapState(['currentWebsite', 'websites']),
     methods: {
       validateHost (val) {
         const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
@@ -121,12 +172,6 @@
           this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过10')
           return false
         }
-      },
-      showAddWebsite () {
-        this.isAddWebsite = true
-      },
-      hideAddWebsite () {
-        this.isAddWebsite = false
       },
       submitAddWebsite () {
         if (this.validateHost(this.hostIpt) && this.validateIndex(this.indexIpt) && this.validateTitle(this.titleIpt)) {
@@ -196,6 +241,68 @@
             this.$set(this.checkLoading, index, true)
             this.$set(this.checkRes, index, '✖')
           })
+      },
+      showEdit (website) {
+        this.tmpWebsite = website
+        this.editHostIpt = website.host
+        this.editIndexIpt = website.index_url
+        this.editTitleIpt = website.title
+        this.isEditWebsite = true
+      },
+      submitEditWebsite () {
+        if (this.validateHost(this.editHostIpt) && this.validateIndex(this.editIndexIpt) && this.validateTitle(this.editTitleIpt)) {
+          this.loading = true
+          this.tmpWebsite.host = this.editHostIpt
+          this.tmpWebsite.index_url = this.editIndexIpt
+          this.tmpWebsite.title = this.editTitleIpt
+          this.$store.dispatch('editWebsite', this.tmpWebsite)
+            .then(res => {
+              return this.$store.dispatch('getWebsites')
+            })
+            .then(res=>{
+              this.$emit('addNotification', '修改成功')
+              this.isEditWebsite = false
+              this.loading = false
+              this.websites.forEach(website=>{
+                if(website.id === this.currentWebsite.id){
+                  this.$store.commit('setCurrentWebsite',website)
+                }
+              })
+            })
+            .catch(()=>{})
+            .catch(() => {
+            this.loading = false
+            this.$emit('addNotification', '修改失败')
+          })
+        }
+      },
+      showDelete (website) {
+        this.$confirm('此操作将永久删除该网站，该网站所有数据将被清除，是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true
+          this.$store.dispatch('deleteWebsite', website.config)
+            .then(res => {
+              this.loading = false
+              let tmpWebsites = this.websites
+              tmpWebsites.splice(tmpWebsites.indexOf(website), 1)
+              this.$store.commit('setWebsites', tmpWebsites)
+              if (this.currentWebsite.id === website.id) {
+                if (this.websites.length !== 0) {
+                  this.$store.commit('setCurrentWebsite', this.websites[0])
+                } else {
+                  this.$store.commit('setCurrentWebsite', null)
+                }
+              }
+              this.$emit('addNotification', '删除成功')
+            })
+            .catch(() => {
+              this.loading = false
+              this.$emit('addNotification', '删除失败')
+            })
+        }).catch(() => {})
       }
     },
     watch: {
@@ -213,6 +320,8 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   h1.title {
+    margin: 20px 0;
+    line-height: 36px;
     position: relative;
     color: #9c9c9c;
     font-size: 26px;
@@ -229,7 +338,7 @@
     text-decoration: none;
     color: #fff;
     background: limegreen;
-    padding: 10px;
+    padding: 5px 10px;
   }
 
   /* 整个表格 */
@@ -264,7 +373,7 @@
 
   table.manage tr td:nth-child(4) {
     /* 代码状态 */
-    width: 128px;
+    width: 160px;
   }
 
   table.manage tr td:nth-child(4) a {
@@ -274,13 +383,13 @@
 
   table.manage tr td:nth-child(5) {
     /* 操作 */
-    width: 128px;
+    width: 160px;
   }
 
-  table.manage tr td:nth-child(5) a {
-    text-decoration: none;
-    color: cornflowerblue;
+  table.manage tr td:nth-child(5) button:last-child {
+    margin-left: 0px;
   }
+
 
   /* 表头每一行 */
   table.manage thead tr {
@@ -304,8 +413,8 @@
     border: none;
   }
 
-  /* 添加网站和获取代码小窗口 */
-  div.add, div.code {
+  /* 添加网站和获取代码和修改代码小窗口 */
+  div.add, div.code, div.edit {
     position: fixed;
     width: 600px;
     background: #ffffff;
@@ -318,7 +427,7 @@
     z-index: 15;
   }
 
-  div.add-wrap, div.code-wrap {
+  div.add-wrap, div.code-wrap， div.edit-wrap {
     position: relative;
   }
 
@@ -402,17 +511,17 @@
     cursor: pointer;
   }
 
-  div.add-wrap .describe {
+  div.describe {
     padding-left: 95px;
   }
 
-  div.add-wrap .describe p {
+  div.describe p {
     margin: 0;
     font-size: 15px;
     color: #666;
   }
 
-  div.add-wrap .input {
+  div.input {
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-start;
@@ -420,7 +529,7 @@
     padding: 15px;
   }
 
-  div.add-wrap .input label {
+  div.input label {
     width: 80px;
     height: 20px;
     line-height: 20px;
@@ -429,7 +538,7 @@
     flex-grow: 0;
   }
 
-  div.add-wrap .input input {
+  div.input input {
     outline: none;
     padding: 1px 15px;
     border: 2px solid #8284ff;
@@ -440,7 +549,7 @@
     flex-grow: 1;
   }
 
-  div.add-wrap .input input:focus {
+  div.input input:focus {
     border: 2px solid #ff736b;
   }
 
