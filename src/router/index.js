@@ -1,12 +1,21 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// @指src
-import Home from '../components/Home.vue'
-import Analytics from '../components/Analytics.vue'
-import Custom from '../components/Custom.vue'
-import Manage from '../components/Manage.vue'
-import Login from '../components/Login.vue'
-import Register from '../components/Register.vue'
+import NProgress from 'nprogress'
+
+NProgress.configure({
+  easing: 'ease', // 动画方式
+  speed: 500, // 递增进度条的速度
+  showSpinner: false, // 是否显示加载ico
+  trickleSpeed: 200, // 自动递增间隔
+  minimum: 0.3 // 初始化时的最小百分比
+})
+
+const Login = () => import('../components/Login.vue')
+const Register = () => import('../components/Register.vue')
+const Home = () => import('../components/Home.vue')
+const Analytics = () => import('../components/Analytics.vue')
+const Custom = () => import('../components/Custom.vue')
+const Manage = () => import('../components/Manage.vue')
 
 Vue.use(Router)
 
@@ -72,6 +81,7 @@ const router = new Router({
 })
 // 全局导航守卫
 router.beforeEach((to, from, next) => {
+  NProgress.start()
   const token = localStorage.getItem('token')
   if (token) {
     if (['login', 'register'].indexOf(to.name) >= 0) { // 已经登录了耍心机还想去登录
@@ -86,5 +96,8 @@ router.beforeEach((to, from, next) => {
       next() // 并不需要token，直接跳转
     }
   }
+})
+router.afterEach(() => {
+  NProgress.done()
 })
 export default router

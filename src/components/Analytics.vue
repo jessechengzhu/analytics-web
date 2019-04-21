@@ -194,8 +194,7 @@
       <!--地域分析-->
       <div class="region-visitor"></div>
     </div>
-    <p class="footer">&copy;Jesse Zhu&nbsp;&nbsp;<a href="http://www.miitbeian.gov.cn/"
-                                                    target="_blank">苏ICP备19002725号</a></p>
+    <br>
   </div>
 </template>
 
@@ -605,7 +604,7 @@
     watch: {
       currentWebsite () {
         this.getStatistics()
-        this.getCompareData(3)
+        this.getCompareData(this.compareDate)
         this.getLimitRecords(this.recordPage)
         this.getRecordsCount()
         this.getONVisitorData(1)

@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  export default {
+  export default{
     name: 'Login',
     // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
     data () {
