@@ -221,21 +221,26 @@
     clear: both;
   }
 
-  p.footer {
-    font-size: 14px;
-    color: #666;
-    text-align: center;;
+
+  /* elementUI全局样式修改 */
+  .el-loading-mask{
+    z-index: 9!important;
+  }
+  .el-select{
+    z-index: 1!important;
   }
 
-  p.footer a {
-    color: #666;
-    text-decoration: none;
-    font-weight: 600;
+  .el-select-dropdown{
+    z-index: 1!important;
   }
 
-  p.footer a:hover {
-    text-decoration: underline;
+  .el-picker-panel{
+    z-index: 1!important;
   }
+  .el-tabs__nav{
+    z-index: auto!important;
+  }
+
 
   /* App组件样式 */
   .header {
@@ -374,7 +379,6 @@
     margin-top: 60px;
     margin-left: 200px;
     padding: 0 15px;
-    z-index: 1;
   }
 
   .side {
@@ -405,4 +409,14 @@
     font-size: 30px;
     background: #d4daff;
   }
+  p.footer a {
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  p.footer a:hover {
+    text-decoration: underline;
+  }
+
 </style>

@@ -259,7 +259,7 @@
     max-height: 80%;
     background: #fff;
     box-shadow: 0 0 2px 2px rgba(0, 0, 0, .2);
-    z-index: 6000;
+    z-index: 15;
   }
 
   div.describe .title{
@@ -319,6 +319,5 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 9;
   }
 </style>

@@ -30,7 +30,7 @@
       </tbody>
     </table>
     <!--指定日期统计数据-->
-    <div class="statistics-choose clear">
+    <div class="statistics-choose">
       <el-date-picker
         class="choose-date"
         v-model="statisticsDate"
@@ -115,7 +115,7 @@
     </el-pagination>
     <div class="detail" v-show="isDetail">
       <div class="title"><span>详细信息</span><span @click="hideDetail">&times</span></div>
-      <div class="content clear" v-loading="detailLoading">
+      <div class="content" v-loading="detailLoading">
         <div class="history">
           <h3>访问记录</h3>
           <table>
@@ -215,6 +215,7 @@
         statisticsDate: null,  // 选择的日期
         /* 比较折线图 */
         compareLoading: true,
+        selectClass:'select-content',
         activeName: 'pv',  // 选择要比较的属性
         compareDate: '3',
         compareOptions: [{
@@ -818,8 +819,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 9;
   }
+
 
   /* 实时访客表格 */
   table.visitor {
