@@ -409,14 +409,4 @@
     font-size: 30px;
     background: #d4daff;
   }
-  p.footer a {
-    color: #666;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  p.footer a:hover {
-    text-decoration: underline;
-  }
-
 </style>

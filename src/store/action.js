@@ -248,6 +248,19 @@ export default {
       }
     })
   },
+  getConversionData ({state}, days) {
+    return new Promise((resolve, reject) => {
+      if (state.currentWebsite) {
+        axios.get('/api/websites/website/conversion/' + state.currentWebsite.config + '?days=' + days)
+          .then(res => {
+            resolve(res)
+          })
+          .catch(err => {
+            reject(err)
+          })
+      }
+    })
+  },
   editWebsite ({state}, website) {
     return new Promise((resolve, reject) => {
       axios.put('/api/websites/website', website)

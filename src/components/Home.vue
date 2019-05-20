@@ -180,4 +180,18 @@
     width: 90%;
   }
 
+  p.footer{
+    text-align: center;
+    font-size: 14px;
+  }
+
+  p.footer a {
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  p.footer a:hover {
+    text-decoration: underline;
+  }
 </style>
