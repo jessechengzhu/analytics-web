@@ -112,8 +112,26 @@
         </tr>
         </tbody>
       </table>
-      <p v-if="websites.length===0" style="text-align: center">你还没有添加网站，<a href="javascript:void(0);" @click="isAddWebsite=true">添加</a>以查看我的网站分析。</p>
+      <p v-if="websites.length===0" style="text-align: center">你还没有添加网站，<a href="javascript:void(0);"
+                                                                           @click="isAddWebsite=true">添加</a>以查看我的网站分析。
+      </p>
     </div>
+    <h1 class="title">用户管理</h1>
+    <h2 class="title">密码修改</h2>
+    <el-form :inline="true" :model="pswForm" status-icon ref="pswForm" class="demo-form-inline" :rules="pswRules">
+      <el-form-item label="旧密码" prop="oldPsw">
+        <el-input v-model="pswForm.oldPsw" placeholder="请输入旧密码"></el-input>
+      </el-form-item>
+      <el-form-item label="注册邮箱" prop="email">
+        <el-input v-model.trim="pswForm.email" placeholder="请输入注册邮箱"></el-input>
+      </el-form-item>
+      <el-form-item label="新密码" prop="newPsw">
+        <el-input v-model="pswForm.newPsw" placeholder="请输入新密码"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="submitPswForm('pswForm')">确定</el-button>
+      </el-form-item>
+    </el-form>
     <br>
   </div>
 </template>
@@ -125,6 +143,30 @@
   export default {
     name: 'Manage',
     data () {
+      let validateOldPsw = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('旧密码不能为空'))
+        } else {
+          callback()
+        }
+      }
+      let validateEmail = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('旧邮箱不能为空'))
+        } else {
+          callback()
+        }
+      }
+      let validateNewPsw = (rule, value, callback) => {
+        const reg = /^[\x20-\x7E]*$/ // 包含所有ASCII字符（含空格）
+        if (value.length < 6 || value.length > 16) {
+          callback(new Error('密码长度在6-16之间'))
+        } else if (!reg.test(value)) {
+          callback(new Error('密码不能包含特殊字符'))
+        } else {
+          callback()
+        }
+      }
       return {
         loading: false,
         hostIpt: '',
@@ -144,6 +186,23 @@
         editTitleIpt: '',
         isEditWebsite: false,
         isDeleteWebsite: false,
+        /* 修改密码 */
+        pswRules: {
+          oldPsw: [
+            {validator: validateOldPsw, trigger: 'blur'}
+          ],
+          email: [
+            {validator: validateEmail, trigger: 'blur'}
+          ],
+          newPsw: [
+            {validator: validateNewPsw, trigger: 'blur'}
+          ]
+        },
+        pswForm: {
+          oldPsw: '',
+          newPsw: '',
+          email: '',
+        },
       }
     },
     computed: mapState(['currentWebsite', 'websites']),
@@ -260,21 +319,21 @@
             .then(res => {
               return this.$store.dispatch('getWebsites')
             })
-            .then(res=>{
+            .then(res => {
               this.$emit('addNotification', '修改成功')
               this.isEditWebsite = false
               this.loading = false
-              this.websites.forEach(website=>{
-                if(website.id === this.currentWebsite.id){
-                  this.$store.commit('setCurrentWebsite',website)
+              this.websites.forEach(website => {
+                if (website.id === this.currentWebsite.id) {
+                  this.$store.commit('setCurrentWebsite', website)
                 }
               })
             })
-            .catch(()=>{})
+            .catch(() => {})
             .catch(() => {
-            this.loading = false
-            this.$emit('addNotification', '修改失败')
-          })
+              this.loading = false
+              this.$emit('addNotification', '修改失败')
+            })
         }
       },
       showDelete (website) {
@@ -304,7 +363,39 @@
               this.$emit('addNotification', '删除失败')
             })
         }).catch(() => {})
-      }
+      },
+      submitPswForm (formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            const changeInfo = {
+              oldPsw: this.pswForm.oldPsw,
+              email: this.pswForm.email,
+              newPsw: this.pswForm.newPsw,
+              username: this.$store.state.user.username
+            }
+            this.$store.dispatch('changePassword', changeInfo)
+              .then(res => {
+                this.showUserOperation = false
+                this.showSelect = false
+                this.selectInfo = '全部网站数据'
+                this.$store.commit('clearUser')
+                this.$emit('addNotification', '', '密码修改成功，请重新登录')
+                this.$router.replace('/login')
+              })
+              .catch(err => {
+                if (err.message === '旧密码错误') {
+                  this.$emit('addNotification', '', '旧密码错误')
+                } else if (err.message === '注册邮箱错误') {
+                  this.$emit('addNotification', '', '注册邮箱错误')
+                } else{
+                  this.$emit('addNotification', '', '其他错误')
+                }
+              })
+          } else {
+            return false
+          }
+        })
+      },
     },
     watch: {
       websites () {
@@ -340,6 +431,14 @@
     color: #fff;
     background: limegreen;
     padding: 5px 10px;
+  }
+
+  h2.title {
+    margin: 18px 0;
+    line-height: 30px;
+    font-size: 22px;
+    color: #9c9c9c;
+    font-weight: normal;
   }
 
   /* 整个表格 */

@@ -118,6 +118,7 @@
       <div class="content" v-loading="detailLoading">
         <div class="history">
           <h3>访问记录</h3>
+          <p>访问来源：{{recordDetail.referrer||'直接访问'}}</p>
           <table>
             <thead>
             <tr>
@@ -977,7 +978,13 @@
     overflow-y: scroll;
     padding: 10px;
   }
-
+  div.detail .content .history p{
+    margin: 0;
+    color: #8c8c8c;
+    font-size: 16px;
+    line-height: 30px;
+    font-weight: normal;
+  }
   div.detail h3 {
     margin: 0;
     line-height: 40px;

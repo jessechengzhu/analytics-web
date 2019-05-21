@@ -81,6 +81,17 @@ export default {
         .catch(err => reject(err))
     })
   },
+  changePassword ({commit}, changeInfo) {
+    return new Promise((resolve, reject) => {
+      axios.put('/api/users/change/password', changeInfo)
+        .then(res => {
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
+  },
   /* 网站 */
   getWebsites ({state, commit}) {
     return new Promise((resolve, reject) => {

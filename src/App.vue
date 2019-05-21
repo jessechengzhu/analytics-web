@@ -21,7 +21,6 @@
                                                                                  :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
             </div>
             <div class="user-operation" v-show="showUserOperation">
-              <a @click="logout">其他操作</a>
               <a @click="logout">登出</a>
             </div>
           </div>
