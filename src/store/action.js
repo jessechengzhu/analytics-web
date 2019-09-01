@@ -1,13 +1,9 @@
 import axios from 'axios'
 import store from './index'
 import router from '../router'
+import config from '../config'
 
-if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:4000'
-} else {
-  // axios.defaults.baseURL = 'http://localhost:4000'
-  axios.defaults.baseURL = 'http://analytics.server.jessezhu.cn'
-}
+axios.defaults.baseURL = config.baseURL
 
 // axios请求拦截器，每次请求前都带上token
 axios.interceptors.request.use(function (config) {
