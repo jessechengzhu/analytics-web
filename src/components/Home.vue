@@ -58,6 +58,7 @@
           <span style="color: #40acdb;">网络工程专业</span>
           <a href="http://www.jessezhu.cn/" target="_blank" style="color: #40acdb;">朱星杰</a>
           同学的开发，指导老师：<span style="color: #40acdb;">陈森博</span>。</h3>
+        <h3 class="introduce">【更新】嘿嘿，我已经毕业啦，这玩意算是超低配版“百度统计”，但也能用，不过你可别真的靠我来统计你的网站啊喂~</h3>
         <h3 class="introduce">
           <router-link to="/login" style="color: darkred; font-weight: 600">开始吧</router-link>
         </h3>
