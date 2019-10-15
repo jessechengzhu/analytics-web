@@ -29,6 +29,12 @@
     computed: {},
     methods: {
       login () {
+          // 演示账号
+          if (this.username === 'zhuxingjie') {
+              this.$store.commit('setVisitor', true)
+          }else {
+              this.$store.commit('setVisitor', false)
+          }
         if (this.username && this.password) {
           this.loading = true
           const loginInfo = {

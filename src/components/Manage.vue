@@ -26,7 +26,7 @@
           <input type="text" id="titleIpt" placeholder="请输入网站名称" v-model="titleIpt">
         </div>
         <div class="button">
-          <button class="sure" @click="submitAddWebsite">确定</button>
+          <button class="sure" @click="visitor?alertWarning('不能更改演示账号哦～'):submitAddWebsite">确定</button>
           <button class="cancel" @click="isAddWebsite = false">取消</button>
         </div>
       </div>
@@ -57,7 +57,7 @@
           <input type="text" id="editTitleIpt" placeholder="请输入网站名称" v-model="editTitleIpt">
         </div>
         <div class="button">
-          <button class="sure" @click="submitEditWebsite">确定</button>
+          <button class="sure" @click="visitor?alertWarning('不能更改演示账号哦～'):submitEditWebsite">确定</button>
           <button class="cancel" @click="isEditWebsite = false">取消</button>
         </div>
       </div>
@@ -76,7 +76,7 @@
       </div>
     </div>
     <div v-loading="loading">
-      <h1 class="title">网站管理<a href="javascript:void(0)" @click="isAddWebsite = true" class="add-btn">新增网站</a>
+      <h1 class="title">网站管理<a href="javascript:void(0)" @click="visitor?alertWarning('不能更改演示账号哦～'):(isAddWebsite = true)" class="add-btn">新增网站</a>
       </h1>
       <table class="manage">
         <thead>
@@ -101,12 +101,12 @@
           <td>
             <el-button
               size="mini"
-              @click="showEdit(website)">编辑
+              @click="visitor?alertWarning('不能更改演示账号哦～'):showEdit(website)">编辑
             </el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="showDelete(website)">删除
+              @click="visitor?alertWarning('不能更改演示账号哦～'):showDelete(website)">删除
             </el-button>
           </td>
         </tr>
@@ -129,7 +129,7 @@
         <el-input v-model="pswForm.newPsw" placeholder="请输入新密码"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitPswForm('pswForm')">确定</el-button>
+        <el-button type="primary" @click="visitor?alertWarning('不能更改演示账号哦～'):submitPswForm('pswForm')">确定</el-button>
       </el-form-item>
     </el-form>
     <br>
@@ -205,7 +205,7 @@
         },
       }
     },
-    computed: mapState(['currentWebsite', 'websites']),
+    computed: mapState(['currentWebsite', 'websites', 'visitor']),
     methods: {
       validateHost (val) {
         const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
@@ -396,6 +396,9 @@
           }
         })
       },
+        alertWarning(text){
+          alert(text)
+        }
     },
     watch: {
       websites () {

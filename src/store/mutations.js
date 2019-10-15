@@ -13,5 +13,8 @@ export default {
   },
   setCurrentWebsite (state, website) {
     state.currentWebsite = website
+  },
+  setVisitor (state, flag){
+    state.visitor = flag
   }
 }

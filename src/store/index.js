@@ -12,7 +12,8 @@ const state = {
   isLogin: false,
   user: null,
   websites: [],
-  currentWebsite: null
+  currentWebsite: null,
+  visitor: false
 }
 export default new Vuex.Store({
   state,
