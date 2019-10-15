@@ -218,7 +218,7 @@
         compareLoading: true,
         selectClass:'select-content',
         activeName: 'pv',  // 选择要比较的属性
-        compareDate: '7',
+        compareDate: '3',
         compareOptions: [{
           value: '3',
           label: '近三天'
