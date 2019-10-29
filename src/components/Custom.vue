@@ -216,149 +216,149 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import { mapState } from 'vuex'
 
-  export default {
-    name: 'Custom',
-    computed: {
-      ...mapState(['currentWebsite','websites']),
-    },
-    data(){
-      return {
-        /* 自定义事件 */
-        showEventDescribe: false,
-        eventLoading: true,
-        activeName: 'all',
-        dateSelect1: '3',
-        dateOptions1: [{
-          value: '1',
-          label: '今天'
-        },{
-          value: '3',
-          label: '近三天'
-        }, {
-          value: '7',
-          label: '近七天'
-        }, {
-          value: '30',
-          label: '近一个月'
-        }],
-        allEventData: [],
-        catEventData: [],
-        actEventData: [],
-        labEventData: [],
-        /* 转化分析 */
-        showConversionDescribe: false,
-        conversionLoading: true,
-        dateSelect2: '3',
-        dateOptions2: [{
-          value: '1',
-          label: '今天'
-        },{
-          value: '3',
-          label: '近三天'
-        }, {
-          value: '7',
-          label: '近七天'
-        }, {
-          value: '30',
-          label: '近一个月'
-        }],
-        conversionData:{},
-        conversionSelect: '',
-        stepName: [],
-        stepData: [],
-      }
-    },
-    methods:{
+export default {
+  name: 'Custom',
+  computed: {
+    ...mapState(['currentWebsite', 'websites'])
+  },
+  data () {
+    return {
       /* 自定义事件 */
-      getEventData(){
-        this.eventLoading = true
-        this.$store.dispatch('getEventData',this.dateSelect1)
-          .then(res=>{
-            this.eventLoading = false
-            this.allEventData= res.events.allEventData
-            this.catEventData= res.events.catEventData
-            this.actEventData= res.events.actEventData
-            this.labEventData= res.events.labEventData
-          })
-          .catch(()=>{this.eventLoading = false})
-      }, // 获取表格数据
+      showEventDescribe: false,
+      eventLoading: true,
+      activeName: 'all',
+      dateSelect1: '3',
+      dateOptions1: [{
+        value: '1',
+        label: '今天'
+      }, {
+        value: '3',
+        label: '近三天'
+      }, {
+        value: '7',
+        label: '近七天'
+      }, {
+        value: '30',
+        label: '近一个月'
+      }],
+      allEventData: [],
+      catEventData: [],
+      actEventData: [],
+      labEventData: [],
       /* 转化分析 */
-      getConversionData(){
-        this.conversionLoading = true
-        this.conversionSelect = ''
-        this.conversionData= {}
-        this.$store.dispatch('getConversionData',this.dateSelect2)
-          .then(res=>{
-            this.conversionLoading = false
-            this.conversionData = res.conversion
-            this.conversionSelect = Object.keys(this.conversionData)[0] || ''
-          })
-          .catch(()=>{this.conversionLoading = false})
-      },  // 获取转化分析
-      calStepPer(index){
-        if(index===0){
-          return 100
-        }else {
-          return Math.floor(10000*this.stepData[index]/this.stepData[index-1])/100
-        }
-      },
-      calFinaPer(index){
-        if(index===-1){
-          let len = this.stepData.length
-          return  Math.floor(10000*this.stepData[len-1]/this.stepData[0])/100
-        }else {
-          return  Math.floor(10000*this.stepData[index]/this.stepData[0])/100
-        }
-      }
-    },
-    watch:{
-      currentWebsite(){
-        this.getEventData()
-      },
-      dateSelect1(){
-        this.getEventData()
-      },
-      dateSelect2(){
-        this.getConversionData()
-      },
-      conversionSelect(val){
-        if (val) {
-          let names = []
-          let datas = []
-          this.conversionData[val][0].forEach(item=>{
-            if(item){
-              names.push(item)
-            }
-          })
-          this.conversionData[val][1].forEach(item=>{
-            if(item){
-              datas.push(item)
-            }
-          })
-          this.stepName = names
-          this.stepData = datas
-        }
-      },
-    },
-    mounted () {
-      if(!this.currentWebsite){
-        if (this.websites.length!==0){
-          this.$store.commit('setCurrentWebsite',this.websites[0])
-        } else {
-          this.$router.push('/manage')
-        }
-      }
-      this.$emit('routerTo', 2)
-      this.getEventData()
-      this.getConversionData()
-      // waTag('conversion', '订单转化', '首页', 1);
-      // waTag('conversion', '订单转化', '商品详情页', 2);
-      // waTag('conversion', '订单转化', '下单', 3);
-      // waTag('conversion', '订单转化', '支付成功', 4);
+      showConversionDescribe: false,
+      conversionLoading: true,
+      dateSelect2: '3',
+      dateOptions2: [{
+        value: '1',
+        label: '今天'
+      }, {
+        value: '3',
+        label: '近三天'
+      }, {
+        value: '7',
+        label: '近七天'
+      }, {
+        value: '30',
+        label: '近一个月'
+      }],
+      conversionData: {},
+      conversionSelect: '',
+      stepName: [],
+      stepData: []
     }
+  },
+  methods: {
+    /* 自定义事件 */
+    getEventData () {
+      this.eventLoading = true
+      this.$store.dispatch('getEventData', this.dateSelect1)
+        .then(res => {
+          this.eventLoading = false
+          this.allEventData = res.events.allEventData
+          this.catEventData = res.events.catEventData
+          this.actEventData = res.events.actEventData
+          this.labEventData = res.events.labEventData
+        })
+        .catch(() => { this.eventLoading = false })
+    }, // 获取表格数据
+    /* 转化分析 */
+    getConversionData () {
+      this.conversionLoading = true
+      this.conversionSelect = ''
+      this.conversionData = {}
+      this.$store.dispatch('getConversionData', this.dateSelect2)
+        .then(res => {
+          this.conversionLoading = false
+          this.conversionData = res.conversion
+          this.conversionSelect = Object.keys(this.conversionData)[0] || ''
+        })
+        .catch(() => { this.conversionLoading = false })
+    }, // 获取转化分析
+    calStepPer (index) {
+      if (index === 0) {
+        return 100
+      } else {
+        return Math.floor(10000 * this.stepData[index] / this.stepData[index - 1]) / 100
+      }
+    },
+    calFinaPer (index) {
+      if (index === -1) {
+        let len = this.stepData.length
+        return Math.floor(10000 * this.stepData[len - 1] / this.stepData[0]) / 100
+      } else {
+        return Math.floor(10000 * this.stepData[index] / this.stepData[0]) / 100
+      }
+    }
+  },
+  watch: {
+    currentWebsite () {
+      this.getEventData()
+    },
+    dateSelect1 () {
+      this.getEventData()
+    },
+    dateSelect2 () {
+      this.getConversionData()
+    },
+    conversionSelect (val) {
+      if (val) {
+        let names = []
+        let datas = []
+        this.conversionData[val][0].forEach(item => {
+          if (item) {
+            names.push(item)
+          }
+        })
+        this.conversionData[val][1].forEach(item => {
+          if (item) {
+            datas.push(item)
+          }
+        })
+        this.stepName = names
+        this.stepData = datas
+      }
+    }
+  },
+  mounted () {
+    if (!this.currentWebsite) {
+      if (this.websites.length !== 0) {
+        this.$store.commit('setCurrentWebsite', this.websites[0])
+      } else {
+        this.$router.push('/manage')
+      }
+    }
+    this.$emit('routerTo', 2)
+    this.getEventData()
+    this.getConversionData()
+    // waTag('conversion', '订单转化', '首页', 1);
+    // waTag('conversion', '订单转化', '商品详情页', 2);
+    // waTag('conversion', '订单转化', '下单', 3);
+    // waTag('conversion', '订单转化', '支付成功', 4);
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

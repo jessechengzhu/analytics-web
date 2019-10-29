@@ -137,279 +137,279 @@
 </template>
 
 <script>
-  import waCode from '../assets/waCode'
-  import { mapState } from 'vuex'
+import waCode from '../assets/waCode'
+import { mapState } from 'vuex'
 
-  export default {
-    name: 'Manage',
-    data () {
-      let validateOldPsw = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('旧密码不能为空'))
-        } else {
-          callback()
-        }
+export default {
+  name: 'Manage',
+  data () {
+    let validateOldPsw = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('旧密码不能为空'))
+      } else {
+        callback()
       }
-      let validateEmail = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('旧邮箱不能为空'))
-        } else {
-          callback()
-        }
+    }
+    let validateEmail = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('旧邮箱不能为空'))
+      } else {
+        callback()
       }
-      let validateNewPsw = (rule, value, callback) => {
-        const reg = /^[\x20-\x7E]*$/ // 包含所有ASCII字符（含空格）
-        if (value.length < 6 || value.length > 16) {
-          callback(new Error('密码长度在6-16之间'))
-        } else if (!reg.test(value)) {
-          callback(new Error('密码不能包含特殊字符'))
-        } else {
-          callback()
-        }
+    }
+    let validateNewPsw = (rule, value, callback) => {
+      const reg = /^[\x20-\x7E]*$/ // 包含所有ASCII字符（含空格）
+      if (value.length < 6 || value.length > 16) {
+        callback(new Error('密码长度在6-16之间'))
+      } else if (!reg.test(value)) {
+        callback(new Error('密码不能包含特殊字符'))
+      } else {
+        callback()
       }
-      return {
-        loading: false,
-        hostIpt: '',
-        indexIpt: '',
-        titleIpt: '',
-        isAddWebsite: false,
-        isGetCode: false,
-        code: ``,
-        copyRes: '',
-        checkRes: [],
-        checkLoading: [],
-        /* 修改网站 */
-        tmpWebsite: null,
-        tmpId: 0,
-        editHostIpt: '',
-        editIndexIpt: '',
-        editTitleIpt: '',
-        isEditWebsite: false,
-        isDeleteWebsite: false,
-        /* 修改密码 */
-        pswRules: {
-          oldPsw: [
-            {validator: validateOldPsw, trigger: 'blur'}
-          ],
-          email: [
-            {validator: validateEmail, trigger: 'blur'}
-          ],
-          newPsw: [
-            {validator: validateNewPsw, trigger: 'blur'}
-          ]
-        },
-        pswForm: {
-          oldPsw: '',
-          newPsw: '',
-          email: '',
-        },
+    }
+    return {
+      loading: false,
+      hostIpt: '',
+      indexIpt: '',
+      titleIpt: '',
+      isAddWebsite: false,
+      isGetCode: false,
+      code: ``,
+      copyRes: '',
+      checkRes: [],
+      checkLoading: [],
+      /* 修改网站 */
+      tmpWebsite: null,
+      tmpId: 0,
+      editHostIpt: '',
+      editIndexIpt: '',
+      editTitleIpt: '',
+      isEditWebsite: false,
+      isDeleteWebsite: false,
+      /* 修改密码 */
+      pswRules: {
+        oldPsw: [
+          {validator: validateOldPsw, trigger: 'blur'}
+        ],
+        email: [
+          {validator: validateEmail, trigger: 'blur'}
+        ],
+        newPsw: [
+          {validator: validateNewPsw, trigger: 'blur'}
+        ]
+      },
+      pswForm: {
+        oldPsw: '',
+        newPsw: '',
+        email: ''
+      }
+    }
+  },
+  computed: mapState(['currentWebsite', 'websites', 'visitor']),
+  methods: {
+    validateHost (val) {
+      const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
+      if (reg.test(val)) {
+        return true
+      } else {
+        this.$emit('addNotification', '域名格式不正确', '请输入正确的域名')
+        return false
       }
     },
-    computed: mapState(['currentWebsite', 'websites', 'visitor']),
-    methods: {
-      validateHost (val) {
-        const reg = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/
-        if (reg.test(val)) {
-          return true
-        } else {
-          this.$emit('addNotification', '域名格式不正确', '请输入正确的域名')
-          return false
-        }
-      },
-      validateIndex (val) {
-        const reg = /^(?=^.{3,255}$)http(s)?:\/\/?(www\.)?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:\d+)*(\/\w+\.\w+)*([\?&]\w+=\w*)*$/
-        if (reg.test(val)) {
-          return true
-        } else {
-          this.$emit('addNotification', '首页地址格式不正确', '请输入正确的首页地址')
-          return false
-        }
-      },
-      validateTitle (val) {
-        if (val.length <= 10) {
-          return true
-        } else {
-          this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过10')
-          return false
-        }
-      },
-      submitAddWebsite () {
-        if (this.validateHost(this.hostIpt) && this.validateIndex(this.indexIpt) && this.validateTitle(this.titleIpt)) {
-          this.loading = true
-          const submitInfo = {host: this.hostIpt, index_url: this.indexIpt, title: this.titleIpt}
-          this.$store.dispatch('addWebsite', submitInfo)
-            .then(res => {
-              this.loading = false
-              this.isAddWebsite = false
-              const websites = this.websites
-              websites.push(res.website)
-              this.$store.commit('setWebsites', websites)
-              if (websites.length === 1) {
-                this.$store.commit('setCurrentWebsite', websites[0])
-              }
-              this.hostIpt = ''
-              this.indexIpt = ''
-              this.titleIpt = ''
-              this.$emit('addNotification', '成功', '添加成功')
-            })
-            .catch(() => {
-              this.loading = false
-              this.$emit('addNotification', '错误', '添加失败')
-            })
-        }
-      },
-      setCode (config) {
-        this.code = waCode(config)
-      },
-      showGetCode () {
-        this.isGetCode = true
-      },
-      hideGetCode () {
-        this.isGetCode = false
-        this.copyRes = ''
-      },
-      copyGetCode () {
-        const textarea = document.querySelector('#code')
-        textarea.select()
-        if (document.execCommand('copy')) {
-          this.copyRes = '已复制到剪贴板'
-        } else {
-          this.copyRes = '复制失败，请手动复制'
-        }
-      },
-      checkAllCode () {
-        for (let i in this.websites) {
-          this.$store.dispatch('validateSite', this.websites[i].id)
-            .then(res => {
-              this.$set(this.checkRes, i, '✔')
-              this.$set(this.checkLoading, i, true)
-            })
-            .catch(err => {
-              this.$set(this.checkRes, i, '✖')
-              this.$set(this.checkLoading, i, true)
-            })
-        }
-      },
-      checkCode (website, index) {
-        this.$set(this.checkLoading, index, false)
-        this.$store.dispatch('validateSite', website.id)
+    validateIndex (val) {
+      const reg = /^(?=^.{3,255}$)http(s)?:\/\/?(www\.)?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+(:\d+)*(\/\w+\.\w+)*([\?&]\w+=\w*)*$/
+      if (reg.test(val)) {
+        return true
+      } else {
+        this.$emit('addNotification', '首页地址格式不正确', '请输入正确的首页地址')
+        return false
+      }
+    },
+    validateTitle (val) {
+      if (val.length <= 10) {
+        return true
+      } else {
+        this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过10')
+        return false
+      }
+    },
+    submitAddWebsite () {
+      if (this.validateHost(this.hostIpt) && this.validateIndex(this.indexIpt) && this.validateTitle(this.titleIpt)) {
+        this.loading = true
+        const submitInfo = {host: this.hostIpt, index_url: this.indexIpt, title: this.titleIpt}
+        this.$store.dispatch('addWebsite', submitInfo)
           .then(res => {
-            this.$set(this.checkLoading, index, true)
-            this.$set(this.checkRes, index, '✔')
+            this.loading = false
+            this.isAddWebsite = false
+            const websites = this.websites
+            websites.push(res.website)
+            this.$store.commit('setWebsites', websites)
+            if (websites.length === 1) {
+              this.$store.commit('setCurrentWebsite', websites[0])
+            }
+            this.hostIpt = ''
+            this.indexIpt = ''
+            this.titleIpt = ''
+            this.$emit('addNotification', '成功', '添加成功')
+          })
+          .catch(() => {
+            this.loading = false
+            this.$emit('addNotification', '错误', '添加失败')
+          })
+      }
+    },
+    setCode (config) {
+      this.code = waCode(config)
+    },
+    showGetCode () {
+      this.isGetCode = true
+    },
+    hideGetCode () {
+      this.isGetCode = false
+      this.copyRes = ''
+    },
+    copyGetCode () {
+      const textarea = document.querySelector('#code')
+      textarea.select()
+      if (document.execCommand('copy')) {
+        this.copyRes = '已复制到剪贴板'
+      } else {
+        this.copyRes = '复制失败，请手动复制'
+      }
+    },
+    checkAllCode () {
+      for (let i in this.websites) {
+        this.$store.dispatch('validateSite', this.websites[i].id)
+          .then(res => {
+            this.$set(this.checkRes, i, '✔')
+            this.$set(this.checkLoading, i, true)
           })
           .catch(err => {
-            this.$set(this.checkLoading, index, true)
-            this.$set(this.checkRes, index, '✖')
+            this.$set(this.checkRes, i, '✖')
+            this.$set(this.checkLoading, i, true)
           })
-      },
-      showEdit (website) {
-        this.tmpWebsite = website
-        this.editHostIpt = website.host
-        this.editIndexIpt = website.index_url
-        this.editTitleIpt = website.title
-        this.isEditWebsite = true
-      },
-      submitEditWebsite () {
-        if (this.validateHost(this.editHostIpt) && this.validateIndex(this.editIndexIpt) && this.validateTitle(this.editTitleIpt)) {
-          this.loading = true
-          this.tmpWebsite.host = this.editHostIpt
-          this.tmpWebsite.index_url = this.editIndexIpt
-          this.tmpWebsite.title = this.editTitleIpt
-          this.$store.dispatch('editWebsite', this.tmpWebsite)
-            .then(res => {
-              return this.$store.dispatch('getWebsites')
-            })
-            .then(res => {
-              this.$emit('addNotification', '修改成功')
-              this.isEditWebsite = false
-              this.loading = false
-              this.websites.forEach(website => {
-                if (website.id === this.currentWebsite.id) {
-                  this.$store.commit('setCurrentWebsite', website)
-                }
-              })
-            })
-            .catch(() => {})
-            .catch(() => {
-              this.loading = false
-              this.$emit('addNotification', '修改失败')
-            })
-        }
-      },
-      showDelete (website) {
-        this.$confirm('此操作将永久删除该网站，该网站所有数据将被清除，是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.loading = true
-          this.$store.dispatch('deleteWebsite', website.config)
-            .then(res => {
-              this.loading = false
-              let tmpWebsites = this.websites
-              tmpWebsites.splice(tmpWebsites.indexOf(website), 1)
-              this.$store.commit('setWebsites', tmpWebsites)
-              if (this.currentWebsite.id === website.id) {
-                if (this.websites.length !== 0) {
-                  this.$store.commit('setCurrentWebsite', this.websites[0])
-                } else {
-                  this.$store.commit('setCurrentWebsite', null)
-                }
-              }
-              this.$emit('addNotification', '删除成功')
-            })
-            .catch(() => {
-              this.loading = false
-              this.$emit('addNotification', '删除失败')
-            })
-        }).catch(() => {})
-      },
-      submitPswForm (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            const changeInfo = {
-              oldPsw: this.pswForm.oldPsw,
-              email: this.pswForm.email,
-              newPsw: this.pswForm.newPsw,
-              username: this.$store.state.user.username
-            }
-            this.$store.dispatch('changePassword', changeInfo)
-              .then(res => {
-                this.showUserOperation = false
-                this.showSelect = false
-                this.selectInfo = '全部网站数据'
-                this.$store.commit('clearUser')
-                this.$emit('addNotification', '', '密码修改成功，请重新登录')
-                this.$router.replace('/login')
-              })
-              .catch(err => {
-                if (err.message === '旧密码错误') {
-                  this.$emit('addNotification', '', '旧密码错误')
-                } else if (err.message === '注册邮箱错误') {
-                  this.$emit('addNotification', '', '注册邮箱错误')
-                } else{
-                  this.$emit('addNotification', '', '其他错误')
-                }
-              })
-          } else {
-            return false
-          }
-        })
-      },
-        alertWarning(text){
-          alert(text)
-        }
-    },
-    watch: {
-      websites () {
-        this.checkAllCode()
       }
     },
-    mounted () {
-      this.$emit('routerTo', 3)
+    checkCode (website, index) {
+      this.$set(this.checkLoading, index, false)
+      this.$store.dispatch('validateSite', website.id)
+        .then(res => {
+          this.$set(this.checkLoading, index, true)
+          this.$set(this.checkRes, index, '✔')
+        })
+        .catch(err => {
+          this.$set(this.checkLoading, index, true)
+          this.$set(this.checkRes, index, '✖')
+        })
+    },
+    showEdit (website) {
+      this.tmpWebsite = website
+      this.editHostIpt = website.host
+      this.editIndexIpt = website.index_url
+      this.editTitleIpt = website.title
+      this.isEditWebsite = true
+    },
+    submitEditWebsite () {
+      if (this.validateHost(this.editHostIpt) && this.validateIndex(this.editIndexIpt) && this.validateTitle(this.editTitleIpt)) {
+        this.loading = true
+        this.tmpWebsite.host = this.editHostIpt
+        this.tmpWebsite.index_url = this.editIndexIpt
+        this.tmpWebsite.title = this.editTitleIpt
+        this.$store.dispatch('editWebsite', this.tmpWebsite)
+          .then(res => {
+            return this.$store.dispatch('getWebsites')
+          })
+          .then(res => {
+            this.$emit('addNotification', '修改成功')
+            this.isEditWebsite = false
+            this.loading = false
+            this.websites.forEach(website => {
+              if (website.id === this.currentWebsite.id) {
+                this.$store.commit('setCurrentWebsite', website)
+              }
+            })
+          })
+          .catch(() => {})
+          .catch(() => {
+            this.loading = false
+            this.$emit('addNotification', '修改失败')
+          })
+      }
+    },
+    showDelete (website) {
+      this.$confirm('此操作将永久删除该网站，该网站所有数据将被清除，是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loading = true
+        this.$store.dispatch('deleteWebsite', website.config)
+          .then(res => {
+            this.loading = false
+            let tmpWebsites = this.websites
+            tmpWebsites.splice(tmpWebsites.indexOf(website), 1)
+            this.$store.commit('setWebsites', tmpWebsites)
+            if (this.currentWebsite.id === website.id) {
+              if (this.websites.length !== 0) {
+                this.$store.commit('setCurrentWebsite', this.websites[0])
+              } else {
+                this.$store.commit('setCurrentWebsite', null)
+              }
+            }
+            this.$emit('addNotification', '删除成功')
+          })
+          .catch(() => {
+            this.loading = false
+            this.$emit('addNotification', '删除失败')
+          })
+      }).catch(() => {})
+    },
+    submitPswForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const changeInfo = {
+            oldPsw: this.pswForm.oldPsw,
+            email: this.pswForm.email,
+            newPsw: this.pswForm.newPsw,
+            username: this.$store.state.user.username
+          }
+          this.$store.dispatch('changePassword', changeInfo)
+            .then(res => {
+              this.showUserOperation = false
+              this.showSelect = false
+              this.selectInfo = '全部网站数据'
+              this.$store.commit('clearUser')
+              this.$emit('addNotification', '', '密码修改成功，请重新登录')
+              this.$router.replace('/login')
+            })
+            .catch(err => {
+              if (err.message === '旧密码错误') {
+                this.$emit('addNotification', '', '旧密码错误')
+              } else if (err.message === '注册邮箱错误') {
+                this.$emit('addNotification', '', '注册邮箱错误')
+              } else {
+                this.$emit('addNotification', '', '其他错误')
+              }
+            })
+        } else {
+          return false
+        }
+      })
+    },
+    alertWarning (text) {
+      alert(text)
+    }
+  },
+  watch: {
+    websites () {
       this.checkAllCode()
     }
+  },
+  mounted () {
+    this.$emit('routerTo', 3)
+    this.checkAllCode()
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -492,7 +492,6 @@
   table.manage tr td:nth-child(5) button:last-child {
     margin-left: 0px;
   }
-
 
   /* 表头每一行 */
   table.manage thead tr {
@@ -655,7 +654,6 @@
   div.input input:focus {
     border: 2px solid #ff736b;
   }
-
 
   div.code-wrap {
     background: #fff;

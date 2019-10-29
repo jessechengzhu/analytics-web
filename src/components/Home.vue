@@ -98,40 +98,40 @@
 </template>
 
 <script>
-  // 使用 createNamespacedHelpers 创建基于某个命名空间辅助函数
-  import { mapState } from 'vuex'
+// 使用 createNamespacedHelpers 创建基于某个命名空间辅助函数
+import { mapState } from 'vuex'
 
-  export default {
-    name: 'Home',
-    data () {
-      return {
-        overview: [],
-        loading: true
-      }
-    },
-    computed: {
-      // 使用对象展开运算符将此对象混入到外部对象中
-      ...mapState(['user'])
-    },
-    methods: {
-      getOverview () {
-        this.$store.dispatch('getOverview')
-          .then(res => {
-            this.loading = false
-            this.overview = res.overview
-          })
-          .catch(() => {})
-      },
-      toAnalytics (website) {
-        this.$store.commit('setCurrentWebsite', website)
-        this.$router.push('/analytics')
-      }
-    },
-    mounted () {
-      this.$emit('routerTo', 0)
-      this.getOverview()
+export default {
+  name: 'Home',
+  data () {
+    return {
+      overview: [],
+      loading: true
     }
+  },
+  computed: {
+    // 使用对象展开运算符将此对象混入到外部对象中
+    ...mapState(['user'])
+  },
+  methods: {
+    getOverview () {
+      this.$store.dispatch('getOverview')
+        .then(res => {
+          this.loading = false
+          this.overview = res.overview
+        })
+        .catch(() => {})
+    },
+    toAnalytics (website) {
+      this.$store.commit('setCurrentWebsite', website)
+      this.$router.push('/analytics')
+    }
+  },
+  mounted () {
+    this.$emit('routerTo', 0)
+    this.getOverview()
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

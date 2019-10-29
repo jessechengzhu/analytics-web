@@ -200,507 +200,507 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import Chart from 'chart.js'
+import { mapState } from 'vuex'
+import Chart from 'chart.js'
 
-  export default {
-    name: 'Analysis',
-    data () {
-      return {
-        /* 今日昨日指定日的统计数据 */
-        statisticsLoading: true,
-        statisticsToday: {},
-        statisticsYesterday: {},
-        statisticsChooseLoading: false,
-        statisticsChoose: {pv: '-', uv: '-', br: '-', ad: '-'},
-        statisticsDate: null,  // 选择的日期
-        /* 比较折线图 */
-        compareLoading: true,
-        selectClass:'select-content',
-        activeName: 'pv',  // 选择要比较的属性
-        compareDate: '3',
-        compareOptions: [{
-          value: '3',
-          label: '近三天'
-        }, {
-          value: '7',
-          label: '近七天'
-        }, {
-          value: '15',
-          label: '近十五天'
-        }, {
-          value: '30',
-          label: '近一个月'
-        }],
-        pvChart: null,
-        uvChart: null,
-        brChart: null,
-        adChart: null,
-        compareLabel: ['前天', '昨天', '今天'],
-        /* 实时访客记录 */
-        visitorLoading: true,
-        records: [],
-        recordsCount: 0,
-        recordPage: 1,
-        recordDetail: {},
-        ipIsOld: false,
-        ipThatDayVisit: 0,
-        isDetail: false,
-        detailLoading: true,
-        /* 新旧访客饼状图 */
-        nosLoading: true,
-        visitorDate: '1',
-        visitorOptions: [{
-          value: '1',
-          label: '今天'
-        }, {
-          value: '3',
-          label: '近三天'
-        }, {
-          value: '7',
-          label: '近七天'
-        }, {
-          value: '30',
-          label: '近一个月'
-        }],
-        novChart: null,
-        /* 留存分析饼状图 */
-        stayLoading: true,
-        activeDays: 30,
-        svChart: null,
-      }
-    },
-    computed: {
-      ...mapState(['currentWebsite','websites']),
-      getOpenTime () {
-        return function (openTime, index) {
-          if (index === 0) {
-            return this.timeToString(this.recordDetail.open_time)
-          } else {
-            return this.timeToString(openTime)
-          }
-        }
-      },
-      getURL () {
-        return function (index) {
-          if (index === 0) {
-            return this.recordDetail.url
-          } else {
-            return this.recordDetail.urls[index]
-          }
-        }
-      },
-      getStay () {
-        return function (openTime, index) {
-          const closeTime = this.recordDetail.close_time
-          if (closeTime) {
-            const openTimes = this.recordDetail.open_times
-            if (index === openTimes.length - 1) {  // 最后一次访问
-              const diffTime = (parseInt(closeTime) - parseInt(openTime)) / 1000
-              return diffTime < 0 ? '正在访问' : this.secondsToMinutes(diffTime)
-            } else {
-              return this.secondsToMinutes((parseInt(openTimes[index + 1]) - parseInt(openTime)) / 1000)
-            }
-          } else {
-            return '正在访问'
-          }
-        }
-      }
-    },
-    methods: {
-      /* canvas */
-      drawCanvas () {
-        this.pvChart = new Chart(document.getElementById('pvCanvas'), {
-          type: 'line',
-          data: {
-            labels: ['前天', '昨天', '今天'],
-            datasets: [{
-              data: [0, 0, 0],
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255,99,132,1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: false,
-            },
-            scales: {
-              /* y轴 */
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true   // 从0开始
-                }
-              }]
-            }
-          }
-        })
-        this.uvChart = new Chart(document.getElementById('uvCanvas'), {
-          type: 'line',
-          data: {
-            labels: ['前天', '昨天', '今天'],
-            datasets: [{
-              data: [0, 0, 0],
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255,99,132,1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: false,
-            },
-            scales: {
-              /* y轴 */
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true   // 从0开始
-                }
-              }]
-            }
-          }
-        })
-        this.brChart = new Chart(document.getElementById('brCanvas'), {
-          type: 'line',
-          data: {
-            labels: ['前天', '昨天', '今天'],
-            datasets: [{
-              data: [0, 0, 0],
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255,99,132,1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: false,
-            },
-            scales: {
-              /* y轴 */
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true   // 从0开始
-                }
-              }]
-            }
-          }
-        })
-        this.adChart = new Chart(document.getElementById('adCanvas'), {
-          type: 'line',
-          data: {
-            labels: ['前天', '昨天', '今天'],
-            datasets: [{
-              data: [0, 0, 0],
-              backgroundColor: 'rgba(255, 99, 132, 0.2)',
-              borderColor: 'rgba(255,99,132,1)',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: false,
-            },
-            scales: {
-              /* y轴 */
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true   // 从0开始
-                }
-              }]
-            }
-          }
-        })
-        this.novChart = new Chart(document.getElementById('novCanvas'), {
-          type: 'pie',
-          data: {
-            labels: ['新访客', '旧访客'],
-            datasets: [{
-              data: [0, 0],
-              backgroundColor: ['rgb(105,255,102)', 'rgb(122,141,255)'],
-              borderColor: 'rgb(255,255,255)',
-              borderWidth: 3
-            }]
-          },
-          options: {
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: true,
-            },
-          }
-        })
-        this.svChart = new Chart(document.getElementById('svCanvas'), {
-          type: 'pie',
-          data: {
-            labels: ['活跃用户', '沉默用户', '流失用户'],
-            datasets: [{
-              data: [10, 10, 10],
-              backgroundColor: ['rgb(255,70,48)', 'rgb(202,122,255)', 'rgb(80,80,80)'],
-              borderColor: 'rgb(255,255,255)',
-              borderWidth: 3
-            }],
-          },
-          options: {
-            title: {
-              display: true,
-              text: '累计用户数：',
-            },
-            responsive: true,// 图表是否响应式
-            legend: {   // 图例
-              display: true,
-            },
-          }
-        })
-      },
-      updateCanvas () {
-        this.pvChart.update()
-        this.uvChart.update()
-        this.brChart.update()
-        this.adChart.update()
-        this.novChart.update()
-        this.svChart.update()
-      },
-      /* 时间转化工具 */
-      timeToDay (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        return month + '月' + day + '日'
-      },
-      timeToFullString (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const year = date.getFullYear()
-        const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
-        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-        return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
-      },
-      timeToString (time) {
-        time = parseInt(time)
-        const date = new Date(time)
-        const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
-        const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
-        const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
-        return hour + ':' + minute + ':' + second
-      },
-      secondsToMinutes (seconds) {
-        let time = ''
-        seconds = parseInt(seconds)
-        if (seconds > 59) {
-          let minutes = Math.floor(seconds / 60)
-          seconds = seconds % 60
-          time = minutes + `′` + seconds + `″`
-        } else {
-          time = seconds + `″`
-        }
-        return time
-      },
-      /* 获取统计数据 */
-      getStatistics () {
-        this.statisticsLoading = true
-        this.$store.dispatch('getStatistics', 0)  // 获取网站指定日期的统计信息
-          .then(res => {
-            this.statisticsToday = res.statistics
-            return this.$store.dispatch('getStatistics', 1)
-          })
-          .then(res => {
-            this.statisticsYesterday = res.statistics
-            this.statisticsLoading = false
-          })
-          .catch(err => {})
-          .catch(err => {})
-      },
-      getStatisticsChoose (dayNum) {
-        this.statisticsChooseLoading = true
-        this.$store.dispatch('getStatistics', dayNum)  // 获取网站指定日期的统计信息
-          .then(res => {
-            this.statisticsChooseLoading = false
-            this.statisticsChoose = res.statistics
-          })
-          .catch(err => {})
-      },
-      /* 折线比较图 */
-      getCompareData (days) {
-        this.compareLoading = true
-        this.$store.dispatch('getCompareData', days)
-          .then(res => {
-            this.compareLoading = false
-            this.pvChart.data.datasets[0].data = res.compare.pvData
-            this.uvChart.data.datasets[0].data = res.compare.uvData
-            this.brChart.data.datasets[0].data = res.compare.brData
-            this.adChart.data.datasets[0].data = res.compare.adData
-            this.updateCanvas()
-          })
-          .catch(err => {})
-      },
+export default {
+  name: 'Analysis',
+  data () {
+    return {
+      /* 今日昨日指定日的统计数据 */
+      statisticsLoading: true,
+      statisticsToday: {},
+      statisticsYesterday: {},
+      statisticsChooseLoading: false,
+      statisticsChoose: {pv: '-', uv: '-', br: '-', ad: '-'},
+      statisticsDate: null, // 选择的日期
+      /* 比较折线图 */
+      compareLoading: true,
+      selectClass: 'select-content',
+      activeName: 'pv', // 选择要比较的属性
+      compareDate: '3',
+      compareOptions: [{
+        value: '3',
+        label: '近三天'
+      }, {
+        value: '7',
+        label: '近七天'
+      }, {
+        value: '15',
+        label: '近十五天'
+      }, {
+        value: '30',
+        label: '近一个月'
+      }],
+      pvChart: null,
+      uvChart: null,
+      brChart: null,
+      adChart: null,
+      compareLabel: ['前天', '昨天', '今天'],
       /* 实时访客记录 */
-      getLimitRecords (page) {
-        this.visitorLoading = true
-        this.$store.dispatch('getLimitRecords', page)
-          .then(res => {
-            this.visitorLoading = false
-            this.records = res.records
-          })
-          .catch(err => {})
-      },
-      getRecordsCount () {
-        this.$store.dispatch('getRecordsCount')
-          .then(res => this.recordsCount = res.count)
-          .catch(err => {})
-      },
-      showDetail (record) {
-        this.recordDetail = record
-        this.isDetail = true
-        this.detailLoading = true
-        this.$store.dispatch('getRecordMore', record.id)
-          .then(res => {
-            this.detailLoading = false
-            this.ipIsOld = res.isOld
-            this.ipThatDayVisit = res.thatDayVisit
-          })
-          .catch(err => {})
-      },
-      hideDetail () {
-        this.isDetail = false
-      },
-      nextPage () {
-        this.recordPage++
-      },
-      prePage () {
-        this.recordPage--
-      },
-      toPage (page) {
-        this.recordPage = page
-      },
+      visitorLoading: true,
+      records: [],
+      recordsCount: 0,
+      recordPage: 1,
+      recordDetail: {},
+      ipIsOld: false,
+      ipThatDayVisit: 0,
+      isDetail: false,
+      detailLoading: true,
       /* 新旧访客饼状图 */
-      getONVisitorData (days) {
-        this.nosLoading = true
-        this.$store.dispatch('getONVisitorData', days)
-          .then(res => {
-            this.nosLoading = false
-            this.novChart.data.datasets[0].data = res.onvisitor
-            this.updateCanvas()
-          })
-          .catch(err => {})
-      },
+      nosLoading: true,
+      visitorDate: '1',
+      visitorOptions: [{
+        value: '1',
+        label: '今天'
+      }, {
+        value: '3',
+        label: '近三天'
+      }, {
+        value: '7',
+        label: '近七天'
+      }, {
+        value: '30',
+        label: '近一个月'
+      }],
+      novChart: null,
       /* 留存分析饼状图 */
-      getSVisitorData (days) {
-        this.stayLoading = true
-        this.$store.dispatch('getSVisitorData', days)
-          .then(res => {
-            this.stayLoading = false
-            this.svChart.data.datasets[0].data = res.svisitor
-            this.svChart.options.title.text = '累计用户数：' + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
-            this.updateCanvas()
-          })
-          .catch(err => {})
+      stayLoading: true,
+      activeDays: 30,
+      svChart: null
+    }
+  },
+  computed: {
+    ...mapState(['currentWebsite', 'websites']),
+    getOpenTime () {
+      return function (openTime, index) {
+        if (index === 0) {
+          return this.timeToString(this.recordDetail.open_time)
+        } else {
+          return this.timeToString(openTime)
+        }
       }
     },
-    watch: {
-      currentWebsite () {
-        this.getStatistics()
-        this.getCompareData(this.compareDate)
-        this.getLimitRecords(this.recordPage)
-        this.getRecordsCount()
-        this.getONVisitorData(1)
-        this.getSVisitorData(30)
-      },
-      statisticsDate (val) {
-        if (val) {
-          const date = new Date(val)
-          const dayNum = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
-          if (dayNum >= 0) {
-            this.getStatisticsChoose(dayNum)
+    getURL () {
+      return function (index) {
+        if (index === 0) {
+          return this.recordDetail.url
+        } else {
+          return this.recordDetail.urls[index]
+        }
+      }
+    },
+    getStay () {
+      return function (openTime, index) {
+        const closeTime = this.recordDetail.close_time
+        if (closeTime) {
+          const openTimes = this.recordDetail.open_times
+          if (index === openTimes.length - 1) { // 最后一次访问
+            const diffTime = (parseInt(closeTime) - parseInt(openTime)) / 1000
+            return diffTime < 0 ? '正在访问' : this.secondsToMinutes(diffTime)
           } else {
-            this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
+            return this.secondsToMinutes((parseInt(openTimes[index + 1]) - parseInt(openTime)) / 1000)
           }
         } else {
-          this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
-        }
-      },
-      compareDate (val) {
-        const nowDate = Date.now()
-        const oneDayTime = 1000 * 60 * 60 * 24
-        let tmp = []
-        switch (val) {
-          case '3':  // 切换到近三天
-            this.pvChart.data.labels = ['前天', '昨天', '今天']
-            this.uvChart.data.labels = ['前天', '昨天', '今天']
-            this.brChart.data.labels = ['前天', '昨天', '今天']
-            this.adChart.data.labels = ['前天', '昨天', '今天']
-            this.getCompareData(3)
-            break
-          case '7':  // 切换到近七天
-            tmp = []
-            for (let i = 6; i > -1; i--) {
-              tmp.push(this.timeToDay(nowDate - oneDayTime * i))
-            }
-            this.pvChart.data.labels = tmp
-            this.uvChart.data.labels = tmp
-            this.brChart.data.labels = tmp
-            this.adChart.data.labels = tmp
-            this.getCompareData(7)
-            break
-          case '15':  // 切换到近十五天
-            tmp = []
-            for (let i = 14; i > -1; i--) {
-              tmp.push(this.timeToDay(nowDate - oneDayTime * i))
-            }
-            this.pvChart.data.labels = tmp
-            this.uvChart.data.labels = tmp
-            this.brChart.data.labels = tmp
-            this.adChart.data.labels = tmp
-            this.getCompareData(15)
-            break
-          case '30':  //切换到近一个月
-            tmp = []
-            for (let i = 29; i > -1; i--) {
-              tmp.push(this.timeToDay(nowDate - oneDayTime * i))
-            }
-            this.pvChart.data.labels = tmp
-            this.uvChart.data.labels = tmp
-            this.brChart.data.labels = tmp
-            this.adChart.data.labels = tmp
-            this.getCompareData(30)
-            break
-          default:
-        }
-      },
-      recordPage () {
-        this.getLimitRecords(this.recordPage)
-      },
-      visitorDate (val) {
-        this.getONVisitorData(val)
-      },
-      activeDays (val) {
-        this.getSVisitorData(val)
-      },
-    },
-    mounted () {
-      if(!this.currentWebsite){
-        if (this.websites.length!==0){
-          this.$store.commit('setCurrentWebsite',this.websites[0])
-        } else {
-          this.$router.push('/manage')
+          return '正在访问'
         }
       }
-      this.$emit('routerTo', 1)
+    }
+  },
+  methods: {
+    /* canvas */
+    drawCanvas () {
+      this.pvChart = new Chart(document.getElementById('pvCanvas'), {
+        type: 'line',
+        data: {
+          labels: ['前天', '昨天', '今天'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: false
+          },
+          scales: {
+            /* y轴 */
+            yAxes: [{
+              ticks: {
+                beginAtZero: true // 从0开始
+              }
+            }]
+          }
+        }
+      })
+      this.uvChart = new Chart(document.getElementById('uvCanvas'), {
+        type: 'line',
+        data: {
+          labels: ['前天', '昨天', '今天'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: false
+          },
+          scales: {
+            /* y轴 */
+            yAxes: [{
+              ticks: {
+                beginAtZero: true // 从0开始
+              }
+            }]
+          }
+        }
+      })
+      this.brChart = new Chart(document.getElementById('brCanvas'), {
+        type: 'line',
+        data: {
+          labels: ['前天', '昨天', '今天'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: false
+          },
+          scales: {
+            /* y轴 */
+            yAxes: [{
+              ticks: {
+                beginAtZero: true // 从0开始
+              }
+            }]
+          }
+        }
+      })
+      this.adChart = new Chart(document.getElementById('adCanvas'), {
+        type: 'line',
+        data: {
+          labels: ['前天', '昨天', '今天'],
+          datasets: [{
+            data: [0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: false
+          },
+          scales: {
+            /* y轴 */
+            yAxes: [{
+              ticks: {
+                beginAtZero: true // 从0开始
+              }
+            }]
+          }
+        }
+      })
+      this.novChart = new Chart(document.getElementById('novCanvas'), {
+        type: 'pie',
+        data: {
+          labels: ['新访客', '旧访客'],
+          datasets: [{
+            data: [0, 0],
+            backgroundColor: ['rgb(105,255,102)', 'rgb(122,141,255)'],
+            borderColor: 'rgb(255,255,255)',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: true
+          }
+        }
+      })
+      this.svChart = new Chart(document.getElementById('svCanvas'), {
+        type: 'pie',
+        data: {
+          labels: ['活跃用户', '沉默用户', '流失用户'],
+          datasets: [{
+            data: [10, 10, 10],
+            backgroundColor: ['rgb(255,70,48)', 'rgb(202,122,255)', 'rgb(80,80,80)'],
+            borderColor: 'rgb(255,255,255)',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          title: {
+            display: true,
+            text: '累计用户数：'
+          },
+          responsive: true, // 图表是否响应式
+          legend: { // 图例
+            display: true
+          }
+        }
+      })
+    },
+    updateCanvas () {
+      this.pvChart.update()
+      this.uvChart.update()
+      this.brChart.update()
+      this.adChart.update()
+      this.novChart.update()
+      this.svChart.update()
+    },
+    /* 时间转化工具 */
+    timeToDay (time) {
+      time = parseInt(time)
+      const date = new Date(time)
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      return month + '月' + day + '日'
+    },
+    timeToFullString (time) {
+      time = parseInt(time)
+      const date = new Date(time)
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1
+      const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
+    },
+    timeToString (time) {
+      time = parseInt(time)
+      const date = new Date(time)
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+      const minute = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      return hour + ':' + minute + ':' + second
+    },
+    secondsToMinutes (seconds) {
+      let time = ''
+      seconds = parseInt(seconds)
+      if (seconds > 59) {
+        let minutes = Math.floor(seconds / 60)
+        seconds = seconds % 60
+        time = minutes + `′` + seconds + `″`
+      } else {
+        time = seconds + `″`
+      }
+      return time
+    },
+    /* 获取统计数据 */
+    getStatistics () {
+      this.statisticsLoading = true
+      this.$store.dispatch('getStatistics', 0) // 获取网站指定日期的统计信息
+        .then(res => {
+          this.statisticsToday = res.statistics
+          return this.$store.dispatch('getStatistics', 1)
+        })
+        .then(res => {
+          this.statisticsYesterday = res.statistics
+          this.statisticsLoading = false
+        })
+        .catch(err => {})
+        .catch(err => {})
+    },
+    getStatisticsChoose (dayNum) {
+      this.statisticsChooseLoading = true
+      this.$store.dispatch('getStatistics', dayNum) // 获取网站指定日期的统计信息
+        .then(res => {
+          this.statisticsChooseLoading = false
+          this.statisticsChoose = res.statistics
+        })
+        .catch(err => {})
+    },
+    /* 折线比较图 */
+    getCompareData (days) {
+      this.compareLoading = true
+      this.$store.dispatch('getCompareData', days)
+        .then(res => {
+          this.compareLoading = false
+          this.pvChart.data.datasets[0].data = res.compare.pvData
+          this.uvChart.data.datasets[0].data = res.compare.uvData
+          this.brChart.data.datasets[0].data = res.compare.brData
+          this.adChart.data.datasets[0].data = res.compare.adData
+          this.updateCanvas()
+        })
+        .catch(err => {})
+    },
+    /* 实时访客记录 */
+    getLimitRecords (page) {
+      this.visitorLoading = true
+      this.$store.dispatch('getLimitRecords', page)
+        .then(res => {
+          this.visitorLoading = false
+          this.records = res.records
+        })
+        .catch(err => {})
+    },
+    getRecordsCount () {
+      this.$store.dispatch('getRecordsCount')
+        .then(res => this.recordsCount = res.count)
+        .catch(err => {})
+    },
+    showDetail (record) {
+      this.recordDetail = record
+      this.isDetail = true
+      this.detailLoading = true
+      this.$store.dispatch('getRecordMore', record.id)
+        .then(res => {
+          this.detailLoading = false
+          this.ipIsOld = res.isOld
+          this.ipThatDayVisit = res.thatDayVisit
+        })
+        .catch(err => {})
+    },
+    hideDetail () {
+      this.isDetail = false
+    },
+    nextPage () {
+      this.recordPage++
+    },
+    prePage () {
+      this.recordPage--
+    },
+    toPage (page) {
+      this.recordPage = page
+    },
+    /* 新旧访客饼状图 */
+    getONVisitorData (days) {
+      this.nosLoading = true
+      this.$store.dispatch('getONVisitorData', days)
+        .then(res => {
+          this.nosLoading = false
+          this.novChart.data.datasets[0].data = res.onvisitor
+          this.updateCanvas()
+        })
+        .catch(err => {})
+    },
+    /* 留存分析饼状图 */
+    getSVisitorData (days) {
+      this.stayLoading = true
+      this.$store.dispatch('getSVisitorData', days)
+        .then(res => {
+          this.stayLoading = false
+          this.svChart.data.datasets[0].data = res.svisitor
+          this.svChart.options.title.text = '累计用户数：' + (res.svisitor[0] + res.svisitor[1] + res.svisitor[2])
+          this.updateCanvas()
+        })
+        .catch(err => {})
+    }
+  },
+  watch: {
+    currentWebsite () {
       this.getStatistics()
-      this.drawCanvas()
-      this.getCompareData(3)
-      this.getLimitRecords(1)
+      this.getCompareData(this.compareDate)
+      this.getLimitRecords(this.recordPage)
       this.getRecordsCount()
       this.getONVisitorData(1)
       this.getSVisitorData(30)
+    },
+    statisticsDate (val) {
+      if (val) {
+        const date = new Date(val)
+        const dayNum = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
+        if (dayNum >= 0) {
+          this.getStatisticsChoose(dayNum)
+        } else {
+          this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
+        }
+      } else {
+        this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
+      }
+    },
+    compareDate (val) {
+      const nowDate = Date.now()
+      const oneDayTime = 1000 * 60 * 60 * 24
+      let tmp = []
+      switch (val) {
+        case '3': // 切换到近三天
+          this.pvChart.data.labels = ['前天', '昨天', '今天']
+          this.uvChart.data.labels = ['前天', '昨天', '今天']
+          this.brChart.data.labels = ['前天', '昨天', '今天']
+          this.adChart.data.labels = ['前天', '昨天', '今天']
+          this.getCompareData(3)
+          break
+        case '7': // 切换到近七天
+          tmp = []
+          for (let i = 6; i > -1; i--) {
+            tmp.push(this.timeToDay(nowDate - oneDayTime * i))
+          }
+          this.pvChart.data.labels = tmp
+          this.uvChart.data.labels = tmp
+          this.brChart.data.labels = tmp
+          this.adChart.data.labels = tmp
+          this.getCompareData(7)
+          break
+        case '15': // 切换到近十五天
+          tmp = []
+          for (let i = 14; i > -1; i--) {
+            tmp.push(this.timeToDay(nowDate - oneDayTime * i))
+          }
+          this.pvChart.data.labels = tmp
+          this.uvChart.data.labels = tmp
+          this.brChart.data.labels = tmp
+          this.adChart.data.labels = tmp
+          this.getCompareData(15)
+          break
+        case '30': // 切换到近一个月
+          tmp = []
+          for (let i = 29; i > -1; i--) {
+            tmp.push(this.timeToDay(nowDate - oneDayTime * i))
+          }
+          this.pvChart.data.labels = tmp
+          this.uvChart.data.labels = tmp
+          this.brChart.data.labels = tmp
+          this.adChart.data.labels = tmp
+          this.getCompareData(30)
+          break
+        default:
+      }
+    },
+    recordPage () {
+      this.getLimitRecords(this.recordPage)
+    },
+    visitorDate (val) {
+      this.getONVisitorData(val)
+    },
+    activeDays (val) {
+      this.getSVisitorData(val)
     }
+  },
+  mounted () {
+    if (!this.currentWebsite) {
+      if (this.websites.length !== 0) {
+        this.$store.commit('setCurrentWebsite', this.websites[0])
+      } else {
+        this.$router.push('/manage')
+      }
+    }
+    this.$emit('routerTo', 1)
+    this.getStatistics()
+    this.drawCanvas()
+    this.getCompareData(3)
+    this.getLimitRecords(1)
+    this.getRecordsCount()
+    this.getONVisitorData(1)
+    this.getSVisitorData(30)
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -821,7 +821,6 @@
     top: 0;
     right: 0;
   }
-
 
   /* 实时访客表格 */
   table.visitor {

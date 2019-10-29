@@ -32,7 +32,9 @@
       </el-row>
     </el-header>
     <el-container>
-      <el-aside width="200px" class="side">
+<!--      <div class="aside-adjust" :class="{'aside-adjust-reverse': asideWidth < 100}" :style="{left: asideLeft + 'px'}"-->
+<!--           @click="asideAdjustClick"></div>-->
+      <el-aside :width="asideWidth+'px'" class="side">
         <div class="list-group">
           <router-link to="/" class="list-group-item" :class="{'choose': chooseH}"
                        tag="div">
@@ -63,148 +65,164 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+import {mapState} from 'vuex'
 
-  export default {
-    name: 'App',
-    data () {
-      return {
-        selectInfo: '全部网站数据',
-        showSelect: false,
-        showUserOperation: false,
-        chooseH: true,
-        chooseA: false,
-        chooseC: false,
-        chooseM: false,
+export default {
+  name: 'App',
+  data () {
+    return {
+      asideWidth: 200,
+      asideLeft: 120,
+      selectInfo: '全部网站数据',
+      showSelect: false,
+      showUserOperation: false,
+      chooseH: true,
+      chooseA: false,
+      chooseC: false,
+      chooseM: false
+    }
+  },
+  computed: mapState(['user', 'websites', 'currentWebsite']),
+  methods: {
+    asideAdjustClick () {
+      if (this.asideWidth > 100) {
+        this.asideWidth = 5
+        this.asideLeft = 5
+      } else {
+        this.asideWidth = 200
+        this.asideLeft = 120
       }
     },
-    computed: mapState(['user', 'websites', 'currentWebsite']),
-    methods: {
-      addNotification (title, message) {
-        const h = this.$createElement
-        this.$notify({
-          title: title,
-          message: h('i', {style: 'color: teal'}, message)
+    addNotification (title, message) {
+      const h = this.$createElement
+      this.$notify({
+        title: title,
+        message: h('i', {style: 'color: teal'}, message)
+      })
+    },
+    logout () {
+      this.showUserOperation = false
+      this.showSelect = false
+      this.$router.replace('/login')
+      this.selectInfo = '全部网站数据'
+      this.$store.commit('clearUser')
+    },
+    getUser () {
+      this.$store.dispatch('getUser')
+        .then(() => {
         })
-      },
-      logout () {
-        this.showUserOperation = false
-        this.showSelect = false
-        this.$router.replace('/login')
+        .catch(() => {
+        })
+    },
+    getWebsites () {
+      this.$store.dispatch('getWebsites')
+        .then(() => {
+          this.loadSessionStorage()
+        })
+        .catch(() => {
+        })
+    },
+    loadSessionStorage () {
+      let currentWebsite = JSON.parse(sessionStorage.getItem('website'))
+      if (currentWebsite) {
+        this.$store.commit('setCurrentWebsite', currentWebsite)
+      } else if (this.websites && this.websites.length !== 0) {
+        this.$store.commit('setCurrentWebsite', this.websites[0])
+      }
+      sessionStorage.removeItem('website')
+    },
+    toggleSelect () {
+      this.showSelect = !this.showSelect
+    },
+    toggleUserOperation () {
+      this.showUserOperation = !this.showUserOperation
+    },
+    routerTo (num) {
+      switch (num) {
+        case -1:
+          this.chooseH = false
+          this.chooseA = false
+          this.chooseC = false
+          this.chooseM = false
+          break
+        case 0:
+          this.chooseH = true
+          this.chooseA = false
+          this.chooseC = false
+          this.chooseM = false
+          break
+        case 1:
+          this.chooseH = false
+          this.chooseA = true
+          this.chooseC = false
+          this.chooseM = false
+          break
+        case 2:
+          this.chooseH = false
+          this.chooseA = false
+          this.chooseC = true
+          this.chooseM = false
+          break
+        case 3:
+          this.chooseH = false
+          this.chooseA = false
+          this.chooseC = false
+          this.chooseM = true
+          break
+        default:
+          this.chooseH = true
+          this.chooseA = false
+          this.chooseC = false
+          this.chooseM = false
+      }
+    },
+    selectWebsite (website) {
+      if (this.chooseH || this.chooseM) {
+        this.$router.push('/analytics')
+      }
+      this.showSelect = false
+      this.selectInfo = '当前选择：' + website.host
+      this.$store.commit('setCurrentWebsite', website)
+    }
+  },
+  watch: {
+    chooseH (choose) {
+      if (choose) {
         this.selectInfo = '全部网站数据'
-        this.$store.commit('clearUser')
-      },
-      getUser () {
-        this.$store.dispatch('getUser')
-          .then(() => {})
-          .catch(() => {})
-      },
-      getWebsites () {
-        this.$store.dispatch('getWebsites')
-          .then(() => {this.loadSessionStorage()})
-          .catch(() => {})
-      },
-      loadSessionStorage () {
-        let currentWebsite = JSON.parse(sessionStorage.getItem('website'))
-        if (currentWebsite) {
-          this.$store.commit('setCurrentWebsite', currentWebsite)
-        } else if (this.websites && this.websites.length !== 0) {
-          this.$store.commit('setCurrentWebsite', this.websites[0])
-        }
-        sessionStorage.removeItem('website')
-      },
-      toggleSelect () {
-        this.showSelect = !this.showSelect
-      },
-      toggleUserOperation () {
-        this.showUserOperation = !this.showUserOperation
-      },
-      routerTo (num) {
-        switch (num) {
-          case -1:
-            this.chooseH = false
-            this.chooseA = false
-            this.chooseC = false
-            this.chooseM = false
-            break
-          case 0:
-            this.chooseH = true
-            this.chooseA = false
-            this.chooseC = false
-            this.chooseM = false
-            break
-          case 1:
-            this.chooseH = false
-            this.chooseA = true
-            this.chooseC = false
-            this.chooseM = false
-            break
-          case 2:
-            this.chooseH = false
-            this.chooseA = false
-            this.chooseC = true
-            this.chooseM = false
-            break
-          case 3:
-            this.chooseH = false
-            this.chooseA = false
-            this.chooseC = false
-            this.chooseM = true
-            break
-          default:
-            this.chooseH = true
-            this.chooseA = false
-            this.chooseC = false
-            this.chooseM = false
-        }
-      },
-      selectWebsite (website) {
-        if (this.chooseH || this.chooseM) {
-          this.$router.push('/analytics')
-        }
-        this.showSelect = false
+      }
+    },
+    chooseC (choose) {
+      if (choose && this.currentWebsite) {
+        this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
+      }
+    },
+    chooseA (choose) {
+      if (choose && this.currentWebsite) {
+        this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
+      }
+    },
+    chooseM (choose) {
+      if (choose) {
+        this.selectInfo = '全部网站数据'
+      }
+    },
+    /* 用于监听刷新页面后vuex数据丢失问题 */
+    currentWebsite (website) {
+      if (website && (this.chooseC || this.chooseA)) {
         this.selectInfo = '当前选择：' + website.host
-        this.$store.commit('setCurrentWebsite', website)
-      }
-    },
-    watch: {
-      chooseH (choose) {
-        if (choose) {
-          this.selectInfo = '全部网站数据'
-        }
-      },
-      chooseC (choose) {
-        if (choose && this.currentWebsite) {
-          this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
-        }
-      },
-      chooseA (choose) {
-        if (choose && this.currentWebsite) {
-          this.selectInfo = '当前选择：' + this.currentWebsite ? this.currentWebsite.host : ''
-        }
-      },
-      chooseM (choose) {
-        if (choose) {
-          this.selectInfo = '全部网站数据'
-        }
-      },
-      /* 用于监听刷新页面后vuex数据丢失问题 */
-      currentWebsite (website) {
-        if (website && (this.chooseC || this.chooseA)) {
-          this.selectInfo = '当前选择：' + website.host
-        } else {
-          this.selectInfo = '全部网站数据'
-        }
-      }
-    },
-    mounted () {
-      this.getUser()
-      this.getWebsites()
-      window.onbeforeunload = () => {
-        sessionStorage.setItem('website', JSON.stringify(this.currentWebsite))
+      } else {
+        this.selectInfo = '全部网站数据'
       }
     }
+  },
+  mounted () {
+    this.getUser()
+    this.getWebsites()
+    window.onbeforeunload = () => {
+      sessionStorage.setItem('website', JSON.stringify(this.currentWebsite))
+    }
   }
+}
 </script>
 
 <style>
@@ -220,26 +238,26 @@
     clear: both;
   }
 
-
   /* elementUI全局样式修改 */
-  .el-loading-mask{
-    z-index: 9!important;
-  }
-  .el-select{
-    z-index: 1!important;
+  .el-loading-mask {
+    z-index: 9 !important;
   }
 
-  .el-select-dropdown{
-    z-index: 1!important;
+  .el-select {
+    z-index: 1 !important;
   }
 
-  .el-picker-panel{
-    z-index: 1!important;
-  }
-  .el-tabs__nav{
-    z-index: auto!important;
+  .el-select-dropdown {
+    z-index: 1 !important;
   }
 
+  .el-picker-panel {
+    z-index: 1 !important;
+  }
+
+  .el-tabs__nav {
+    z-index: auto !important;
+  }
 
   /* App组件样式 */
   .header {
@@ -407,5 +425,25 @@
     line-height: 60px;
     font-size: 30px;
     background: #d4daff;
+  }
+
+  .aside-adjust {
+    position: fixed;
+    z-index: 6;
+    top: 50%;
+    margin-top: -20px;
+    border-top: 40px solid transparent;
+    border-left: 40px solid transparent;
+    border-bottom: 40px solid transparent;
+    border-right: 40px solid rgb(163, 140, 205);
+  }
+
+  .aside-adjust-reverse {
+    border-right: 40px solid transparent;
+    border-left: 40px solid rgb(163, 140, 205);
+  }
+
+  .aside-adjust:hover {
+    cursor: pointer;
   }
 </style>

@@ -15,55 +15,55 @@
 </template>
 
 <script>
-  export default{
-    name: 'Login',
-    // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
-    data () {
-      return {
-        username: '',
-        password: '',
-        message: '',
-        loading: false
-      }
-    },
-    computed: {},
-    methods: {
-      login () {
-          // 演示账号
-          if (this.username === 'zhuxingjie') {
-              this.$store.commit('setVisitor', true)
-          }else {
-              this.$store.commit('setVisitor', false)
-          }
-        if (this.username && this.password) {
-          this.loading = true
-          const loginInfo = {
-            username: this.username,
-            password: this.password
-          }
-          this.$store.dispatch('login', loginInfo)
-            .then(res => {
-              this.message = res.message
-              this.$router.push('/')
-              this.$store.dispatch('getWebsites')
-                .then(res => {
-                  this.$store.commit('setCurrentWebsite', res.websites[0])
-                })
-                .catch(err=>{})
-              this.$emit('routerTo', 0)
-              this.loading = false
-            })
-            .catch(err => {
-              this.message = err.message
-              this.loading = false
-            })
-        }
-      }
-    },
-    mounted () {
-      this.$emit('routerTo', -1)
+export default{
+  name: 'Login',
+  // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
+  data () {
+    return {
+      username: '',
+      password: '',
+      message: '',
+      loading: false
     }
+  },
+  computed: {},
+  methods: {
+    login () {
+      // 演示账号
+      if (this.username === 'zhuxingjie') {
+        this.$store.commit('setVisitor', true)
+      } else {
+        this.$store.commit('setVisitor', false)
+      }
+      if (this.username && this.password) {
+        this.loading = true
+        const loginInfo = {
+          username: this.username,
+          password: this.password
+        }
+        this.$store.dispatch('login', loginInfo)
+          .then(res => {
+            this.message = res.message
+            this.$router.push('/')
+            this.$store.dispatch('getWebsites')
+              .then(res => {
+                this.$store.commit('setCurrentWebsite', res.websites[0])
+              })
+              .catch(err => {})
+            this.$emit('routerTo', 0)
+            this.loading = false
+          })
+          .catch(err => {
+            this.message = err.message
+            this.loading = false
+          })
+      }
+    }
+  },
+  mounted () {
+    this.$emit('routerTo', -1)
   }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
