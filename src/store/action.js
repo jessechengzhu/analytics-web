@@ -1,9 +1,6 @@
 import axios from 'axios'
 import store from './index'
 import router from '../router'
-import config from '../config'
-
-axios.defaults.baseURL = config.baseURL
 
 // axios请求拦截器，每次请求前都带上token
 axios.interceptors.request.use(function (config) {
