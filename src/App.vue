@@ -262,9 +262,8 @@ export default {
   /* App组件样式 */
   .header {
     width: 100%;
-    position: fixed;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-    min-width: 1300px;
+    min-width: 1000px;
     background: linear-gradient(90deg, #6982e7, #e791bb);
     color: #fff;
     z-index: 10;
@@ -393,14 +392,17 @@ export default {
   }
 
   .main {
-    margin-top: 60px;
-    margin-left: 200px;
+    top: 60px;
+    left: 200px;
+    min-width: 800px;
+    position: absolute;
     padding: 0 15px;
   }
 
   .side {
-    margin-top: 60px;
-    position: fixed;
+    top: 60px;
+    left: 0;
+    position: absolute;
     box-shadow: 1px 0 rgba(0, 0, 0, 0.1);
     height: 100%;
     z-index: 5;

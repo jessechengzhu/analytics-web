@@ -87,7 +87,7 @@
         <td>地域</td>
         <td>入口页面</td>
         <td>IP</td>
-        <td>访问时长</td>
+        <!-- <td>访问时长</td> -->
         <td>访问页数</td>
       </tr>
       </thead>
@@ -98,7 +98,7 @@
         <td><span :title="record.address">{{record.address}}</span></td>
         <td><a :href="record.url" target="_blank" :title="record.url">{{record.url}}</a></td>
         <td>{{record.ip}}</td>
-        <td>{{record.duration}}</td>
+        <!-- <td>{{record.duration}}</td> -->
         <td>{{record.visitPages}}</td>
       </tr>
       </tbody>
@@ -124,14 +124,14 @@
             <tr>
               <td>打开时间</td>
               <td>页面地址</td>
-              <td>停留</td>
+              <!-- <td>停留</td> -->
             </tr>
             </thead>
             <tbody>
             <tr v-for="(openTime,index) of recordDetail.open_times">
               <td>{{getOpenTime(openTime,index)}}</td>
               <td>{{getURL(index)}}</td>
-              <td>{{getStay(openTime,index)}}</td>
+              <!-- <td>{{getStay(openTime,index)}}</td> -->
             </tr>
             </tbody>
           </table>
@@ -927,7 +927,7 @@ export default {
   /* 记录细节弹窗 */
   div.detail {
     position: fixed;
-    width: 600px;
+    width: 60%;
     background: #ffffff;
     box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
     top: 50%;

@@ -6,8 +6,7 @@
         <el-table
           v-loading="loading"
           :data="overview"
-          @row-click="toAnalytics"
-          style="width: 100%">
+          @row-click="toAnalytics">
           <el-table-column
             prop="name"
             label="网站名称">
@@ -15,32 +14,27 @@
           <el-table-column
             align="center"
             prop="pv"
-            label="今日浏览量(PV)"
-            width="126">
+            label="今日浏览量(PV)">
           </el-table-column>
           <el-table-column
             align="center"
             prop="uv"
-            label="今日流量(UV)"
-            width="112">
+            label="今日流量(UV)">
           </el-table-column>
           <el-table-column
             align="center"
             prop="br"
-            label="今日跳出率"
-            width="112">
+            label="今日跳出率">
           </el-table-column>
           <el-table-column
             align="center"
             prop="ad"
-            label="今日平均访问时长"
-            width="140">
+            label="今日平均访问时长">
           </el-table-column>
           <el-table-column
             align="center"
             prop="ol"
-            label="实时在线人数"
-            width="112">
+            label="实时在线人数">
           </el-table-column>
         </el-table>
         <p v-if="overview.length===0" style="text-align: center">空空如也，快去

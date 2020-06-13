@@ -518,7 +518,7 @@ export default {
   /* 添加网站和获取代码和修改代码小窗口 */
   div.add, div.code, div.edit {
     position: fixed;
-    width: 600px;
+    width: 60%;
     background: #ffffff;
     box-shadow: 0 0 5px 5px rgba(0, 0, 0, .1);
     overflow: hidden;
@@ -660,9 +660,8 @@ export default {
   }
 
   div.code-wrap .code-content {
-    width: 580px;
     height: 150px;
-    padding: 10px;
+    padding: 10px 15px 10px 10px;
     color: #333;
   }
 
