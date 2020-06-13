@@ -26,7 +26,7 @@
           <input type="text" id="titleIpt" placeholder="请输入网站名称" v-model="titleIpt">
         </div>
         <div class="button">
-          <button class="sure" @click="visitor?alertWarning('不能更改演示账号哦～'):submitAddWebsite">确定</button>
+          <button class="sure" @click="visitor?alertWarning('不能更改演示账号哦～'):submitAddWebsite()">确定</button>
           <button class="cancel" @click="isAddWebsite = false">取消</button>
         </div>
       </div>
@@ -226,10 +226,10 @@ export default {
       }
     },
     validateTitle (val) {
-      if (val.length <= 10) {
+      if (val.length <= 20) {
         return true
       } else {
-        this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过10')
+        this.$emit('addNotification', '标题名称不正确', '网站名称长度不要超过20')
         return false
       }
     },

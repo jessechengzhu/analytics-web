@@ -7,14 +7,11 @@
   <link rel="stylesheet" href="./static/css/font-awesome.min.css">
   <link rel="shortcut icon" type='image/x-icon' href="./static/favicon/favicon.ico">
   <title>网站分析</title>
+  <script async src="http://analytics.jessezhu.cn/resources/javascripts/wa.js"></script>
   <script>
-      var _hmt = _hmt || [];
-      (function() {
-          var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?bc9948c8450cc113fb310e9ef627c252";
-          var s = document.getElementsByTagName("script")[0];
-          s.parentNode.insertBefore(hm, s);
-      })();
+      window.waData = window.waData || [];
+      function waTag(){waData.push(arguments);}
+      waTag('config', 'WA-LNH5FK-1');
   </script>
 </head>
 <body>
