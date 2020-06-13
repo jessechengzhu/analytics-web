@@ -394,6 +394,7 @@ export default {
   .main {
     top: 60px;
     left: 200px;
+    right: 0;
     min-width: 800px;
     position: absolute;
     padding: 0 15px;
