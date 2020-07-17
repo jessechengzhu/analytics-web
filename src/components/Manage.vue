@@ -8,18 +8,18 @@
           <input type="text" id="hostIpt" placeholder="请输入网站域名" v-model="hostIpt">
         </div>
         <div class="describe">
-          <p>1. jessezhu.cn 或 jessezhu.cn:8080</p>
-          <p>2. www.jessezhu.cn 或 www.jessezhu.cn:8080</p>
-          <p>3. analytics.jessezhu.cn 或 analytics.jessezhu.cn:8080</p>
+          <p>1. wzmxx.com 或 wzmxx.com:8080</p>
+          <p>2. www.wzmxx.com 或 www.wzmxx.com:8080</p>
+          <p>3. analytics.wzmxx.com 或 analytics.wzmxx.com:8080</p>
         </div>
         <div class="input">
           <label for="indexIpt">网站首页</label>
           <input type="text" id="indexIpt" placeholder="请输入网站首页" v-model="indexIpt">
         </div>
         <div class="describe">
-          <p>1. http://www.jessezhu.cn</p>
-          <p>2. http://www.jessezhu.cn/index.html</p>
-          <p>3. https://www.jessezhu.cn</p>
+          <p>1. http://www.wzmxx.com</p>
+          <p>2. http://www.wzmxx.com/index.html</p>
+          <p>3. https://www.wzmxx.com</p>
         </div>
         <div class="input">
           <label for="titleIpt">网站名称</label>
@@ -39,18 +39,18 @@
           <input type="text" id="editHostIpt" placeholder="请输入新网站域名" v-model="editHostIpt">
         </div>
         <div class="describe">
-          <p>1. jessezhu.cn 或 jessezhu.cn:8080</p>
-          <p>2. www.jessezhu.cn 或 www.jessezhu.cn:8080</p>
-          <p>3. analytics.jessezhu.cn 或 analytics.jessezhu.cn:8080</p>
+          <p>1. wzmxx.com 或 wzmxx.com:8080</p>
+          <p>2. www.wzmxx.com 或 www.wzmxx.com:8080</p>
+          <p>3. analytics.wzmxx.com 或 analytics.wzmxx.com:8080</p>
         </div>
         <div class="input">
           <label for="editIndexIpt">网站首页</label>
           <input type="text" id="editIndexIpt" placeholder="请输入网站首页" v-model="editIndexIpt">
         </div>
         <div class="describe">
-          <p>1. http://www.jessezhu.cn</p>
-          <p>2. http://www.jessezhu.cn/index.html</p>
-          <p>3. https://www.jessezhu.cn</p>
+          <p>1. http://www.wzmxx.com</p>
+          <p>2. http://www.wzmxx.com/index.html</p>
+          <p>3. https://www.wzmxx.com</p>
         </div>
         <div class="input">
           <label for="editTitleIpt">网站名称</label>
