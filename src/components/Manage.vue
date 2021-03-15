@@ -57,7 +57,7 @@
           <input type="text" id="editTitleIpt" placeholder="请输入网站名称" v-model="editTitleIpt">
         </div>
         <div class="button">
-          <button class="sure" @click="visitor?alertWarning('不能更改演示账号哦～'):submitEditWebsite">确定</button>
+          <button class="sure" disabled @click="visitor?alertWarning('不能更改演示账号哦～'):submitEditWebsite">确定</button>
           <button class="cancel" @click="isEditWebsite = false">取消</button>
         </div>
       </div>
@@ -106,6 +106,7 @@
             <el-button
               size="mini"
               type="danger"
+              disabled
               @click="visitor?alertWarning('不能更改演示账号哦～'):showDelete(website)">删除
             </el-button>
           </td>
@@ -116,7 +117,7 @@
                                                                            @click="isAddWebsite=true">添加</a>以查看我的网站分析。
       </p>
     </div>
-    <h1 class="title">用户管理</h1>
+    <!-- <h1 class="title">用户管理</h1>
     <h2 class="title">密码修改</h2>
     <el-form :inline="true" :model="pswForm" status-icon ref="pswForm" class="demo-form-inline" :rules="pswRules">
       <el-form-item label="旧密码" prop="oldPsw">
@@ -131,7 +132,7 @@
       <el-form-item>
         <el-button type="primary" @click="visitor?alertWarning('不能更改演示账号哦～'):submitPswForm('pswForm')">确定</el-button>
       </el-form-item>
-    </el-form>
+    </el-form> -->
     <br>
   </div>
 </template>

@@ -56,7 +56,7 @@
         <h3 class="introduce">
           <router-link to="/login" style="color: darkred; font-weight: 600">开始吧</router-link>
         </h3>
-        <h3 class="introduce">提供演示账号：用户名 zhuxingjie    密码 123456  部分效果如折线图因缺少数据可能得不到展示</h3>
+        <h3 class="introduce">提供演示账号：用户名 admin    密码 123456  部分效果如折线图因缺少数据可能得不到展示</h3>
       </el-col>
     </el-row>
     <el-row>

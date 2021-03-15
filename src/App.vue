@@ -398,15 +398,17 @@ export default {
     min-width: 800px;
     position: absolute;
     padding: 0 15px;
+    box-shadow: -1px 0 rgba(0, 0, 0, 0.1);
+    z-index: 5;
+    background: #ffffff;
   }
 
   .side {
     top: 60px;
     left: 0;
     position: absolute;
-    box-shadow: 1px 0 rgba(0, 0, 0, 0.1);
     height: 100%;
-    z-index: 5;
+    background: #ffffff;
   }
 
   .side .list-group .list-group-item {

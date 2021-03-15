@@ -84,7 +84,7 @@
       <tr>
         <td></td>
         <td>访问时间</td>
-        <td>地域</td>
+        <!-- <td>地域</td> -->
         <td>入口页面</td>
         <td>IP</td>
         <!-- <td>访问时长</td> -->
@@ -95,7 +95,7 @@
       <tr v-for="record of records">
         <td @click="showDetail(record)">+</td>
         <td>{{timeToFullString(record.open_time)}}</td>
-        <td><span :title="record.address">{{record.address}}</span></td>
+        <!-- <td><span :title="record.address">{{record.address}}</span></td> -->
         <td><a :href="record.url" target="_blank" :title="record.url">{{record.url}}</a></td>
         <td>{{record.ip}}</td>
         <!-- <td>{{record.duration}}</td> -->
@@ -859,26 +859,26 @@ export default {
 
   table.visitor tr td:nth-child(3) {
     /* 地域 */
-    width: 208px;
+    /* width: 100px; */
   }
 
-  table.visitor tr td:nth-child(4) a {
+  table.visitor tr td:nth-child(3) a {
     /* 入口页面 */
     text-decoration: none;
     color: cornflowerblue;
   }
 
-  table.visitor tr td:nth-child(5) {
+  table.visitor tr td:nth-child(4) {
     /* ip */
     width: 176px;
   }
 
-  table.visitor tr td:nth-child(6) {
+  table.visitor tr td:nth-child(5) {
     /* 访问时长 */
     width: 96px;
   }
 
-  table.visitor tr td:nth-child(7) {
+  table.visitor tr td:nth-child(6) {
     /* 访问页数 */
     width: 80px;
   }
