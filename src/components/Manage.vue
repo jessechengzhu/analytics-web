@@ -95,7 +95,7 @@
           <td>{{website.index_url}}</td>
           <td v-loading="!checkLoading[index]">
             <span :style="{color: checkRes[index]==='✖'?'darkred':'limegreen'}">{{checkRes[index]}}</span>
-            <a href="javascript:void(0)" @click="checkCode(website,index)" title="刷新"><i class="fa fa-refresh"></i></a>
+            <a href="javascript:void(0)" @click="checkCode(website,index)" title="刷新"><i class="el-icon-refresh"></i></a>
             <a href="javascript:void(0)" @click="setCode(website.config),showGetCode()">获取代码</a>
           </td>
           <td>
@@ -409,6 +409,7 @@ export default {
   mounted () {
     this.$emit('routerTo', 3)
     this.checkAllCode()
+    waTag('event', '管理页面', '访问', '访问管理页面')
   }
 }
 </script>

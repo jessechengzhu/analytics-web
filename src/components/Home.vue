@@ -23,11 +23,6 @@
           </el-table-column>
           <el-table-column
             align="center"
-            prop="br"
-            label="今日跳出率">
-          </el-table-column>
-          <el-table-column
-            align="center"
             prop="ad"
             label="今日平均访问时长">
           </el-table-column>
@@ -124,6 +119,9 @@ export default {
   mounted () {
     this.$emit('routerTo', 0)
     this.getOverview()
+    waTag('conversion', '登录转化', '首页', 1)
+    waTag('conversion', '注册转化', '首页', 1)
+    waTag('event', '主页', '访问', '访问主页')
   }
 }
 </script>

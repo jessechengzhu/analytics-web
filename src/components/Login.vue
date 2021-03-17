@@ -35,6 +35,7 @@ export default{
       // } else {
       //   this.$store.commit('setVisitor', false)
       // }
+      waTag('event', '登录按钮', '点击', '登录')
       if (this.username && this.password) {
         this.loading = true
         const loginInfo = {
@@ -62,6 +63,7 @@ export default{
   },
   mounted () {
     this.$emit('routerTo', -1)
+    waTag('conversion', '登录转化', '登录页', 2)
   }
 }
 </script>

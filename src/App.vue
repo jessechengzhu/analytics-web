@@ -5,8 +5,7 @@
         <el-col :span="16" class="header-left">
           <router-link to="/" class="logo" tag="div"></router-link>
           <div class="select" @click="toggleSelect">
-            {{selectInfo}}&nbsp;<i class="fa fa-lg"
-                                   :class="{'fa-caret-right': !showSelect, 'fa-caret-left': showSelect}"></i>
+            {{selectInfo}}&nbsp;<i :class="{'el-icon-caret-right': !showSelect, 'el-icon-caret-left': showSelect}"></i>
           </div>
           <div class="select-content" v-show="showSelect">
             <ul>
@@ -17,8 +16,8 @@
         <el-col :span="8" class="header-right">
           <div v-if="user" class="user">
             <div class="user-avatar" @click="toggleUserOperation">
-              <i class="fa fa-user-circle-o"></i>&nbsp;{{user.username}}&nbsp;<i class="fa fa-lg"
-                                                                                 :class="{'fa-caret-down':!showUserOperation,'fa-caret-up':showUserOperation}"></i>
+              <i class="el-icon-user-solid"></i>&nbsp;{{user.username}}&nbsp;
+              <i :class="{'el-icon-caret-bottom':!showUserOperation,'el-icon-caret-top':showUserOperation}"></i>
             </div>
             <div class="user-operation" v-show="showUserOperation">
               <a @click="logout">登出</a>
@@ -38,19 +37,19 @@
         <div class="list-group">
           <router-link to="/" class="list-group-item" :class="{'choose': chooseH}"
                        tag="div">
-            <i class="fa fa-home fa-fw" style="color: #4f97e7"></i>&nbsp;主页
+            <i class="el-icon-s-home" style="color: #4f97e7"></i>&nbsp;主页
           </router-link>
           <router-link to="/analytics" class="list-group-item" :class="{'choose': chooseA}"
                        tag="div">
-            <i class="fa fa-line-chart fa-fw" style="color: #e7cd5a"></i>&nbsp;分析
+            <i class="el-icon-s-data" style="color: #e7cd5a"></i>&nbsp;分析
           </router-link>
           <router-link to="/custom" class="list-group-item" :class="{'choose': chooseC}"
                        tag="div">
-            <i class="fa fa-bar-chart fa-fw" style="color: #e78271"></i>&nbsp;高级
+            <i class="el-icon-s-check" style="color: #e78271"></i>&nbsp;高级
           </router-link>
           <router-link to="/manage" class="list-group-item" :class="{'choose': chooseM}"
                        tag="div">
-            <i class="fa fa-cog fa-fw" style="color: #e76cb2"></i>&nbsp;管理
+            <i class="el-icon-setting" style="color: #e76cb2"></i>&nbsp;管理
           </router-link>
         </div>
       </el-aside>

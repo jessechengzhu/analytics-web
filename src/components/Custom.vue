@@ -1,15 +1,13 @@
 <template>
   <div>
     <!--自定义事件-->
-    <h1 class="title">自定义事件&nbsp;<i class="fa fa-question-circle" @click="showEventDescribe=!showEventDescribe"></i></h1>
+    <h1 class="title">自定义事件&nbsp;<i class="el-icon-question" @click="showEventDescribe=!showEventDescribe"></i></h1>
     <div class="custom" v-loading="eventLoading">
       <el-tabs v-model="activeName">
         <el-tab-pane label="全部事件" name="all">
           <el-table
             :data="allEventData"
-            height="300"
             border
-            show-summary
             style="width: 100%">
             <el-table-column
               prop="name"
@@ -30,9 +28,7 @@
         <el-tab-pane label="类型" name="cat">
           <el-table
             :data="catEventData"
-            height="300"
             border
-            show-summary
             style="width: 100%">
             <el-table-column
               prop="name"
@@ -53,9 +49,7 @@
         <el-tab-pane label="操作" name="act">
           <el-table
             :data="actEventData"
-            height="300"
             border
-            show-summary
             style="width: 100%">
             <el-table-column
               prop="name"
@@ -76,9 +70,7 @@
         <el-tab-pane label="标签" name="lab">
           <el-table
             :data="labEventData"
-            height="300"
             border
-            show-summary
             style="width: 100%">
             <el-table-column
               prop="name"
@@ -107,7 +99,7 @@
       </el-select>
     </div>
     <!--转化分析-->
-    <h1 class="title">转化分析&nbsp;<i class="fa fa-question-circle" @click="showConversionDescribe=!showConversionDescribe"></i></h1>
+    <h1 class="title">转化分析&nbsp;<i class="el-icon-question" @click="showConversionDescribe=!showConversionDescribe"></i></h1>
     <div class="custom">
       <el-select v-model="conversionSelect" class="conversion-select" v-loading="conversionLoading">
         <el-option
@@ -353,6 +345,7 @@ export default {
     this.$emit('routerTo', 2)
     this.getEventData()
     this.getConversionData()
+    waTag('event', '高级页面', '访问', '访问高级页面')
     // waTag('conversion', '订单转化', '首页', 1);
     // waTag('conversion', '订单转化', '商品详情页', 2);
     // waTag('conversion', '订单转化', '下单', 3);
@@ -374,12 +367,6 @@ export default {
     font-size: 26px;
     font-weight: normal;
     font-family: "Arial", sans-serif;
-  }
-  h1.title i.fa{
-    color: dodgerblue;
-  }
-  h1.title i.fa:hover{
-    cursor: pointer;
   }
 
   div.fade-enter-active, div.fade-leave-active {

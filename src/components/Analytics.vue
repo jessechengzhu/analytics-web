@@ -8,7 +8,6 @@
         <td></td>
         <td>浏览量PV</td>
         <td>流量UV</td>
-        <td>跳出率</td>
         <td>平均访问时长</td>
       </tr>
       </thead>
@@ -17,14 +16,12 @@
         <td>今日</td>
         <td>{{ statisticsToday.pv }}</td>
         <td>{{ statisticsToday.uv }}</td>
-        <td>{{ statisticsToday.br }}</td>
         <td>{{ statisticsToday.ad }}</td>
       </tr>
       <tr v-if="statisticsYesterday">
         <td>昨日</td>
         <td>{{ statisticsYesterday.pv }}</td>
         <td>{{ statisticsYesterday.uv }}</td>
-        <td>{{ statisticsYesterday.br }}</td>
         <td>{{ statisticsYesterday.ad }}</td>
       </tr>
       </tbody>
@@ -40,11 +37,10 @@
       <div class="choose-result clear" v-loading="statisticsChooseLoading">
         <div>浏览量PV：<span>{{ statisticsChoose.pv }}</span></div>
         <div>流量UV：<span>{{ statisticsChoose.uv }}</span></div>
-        <div>跳出率：<span>{{ statisticsChoose.br }}</span></div>
         <div>平均访问时长：<span>{{ statisticsChoose.ad }}</span></div>
       </div>
     </div>
-    <!--pv uv br ad的折线图比较-->
+    <!--pv uv ad的折线图比较-->
     <div class="compare" v-loading="compareLoading">
       <el-tabs v-model="activeName">
         <el-tab-pane label="浏览量PV/次" name="pv">
@@ -54,11 +50,6 @@
         </el-tab-pane>
         <el-tab-pane label="流量UV/次" name="uv">
           <canvas id="uvCanvas" width="400" height="100">
-            <p>Canvas</p>
-          </canvas>
-        </el-tab-pane>
-        <el-tab-pane label="跳出率/%" name="br">
-          <canvas id="brCanvas" width="400" height="100">
             <p>Canvas</p>
           </canvas>
         </el-tab-pane>
@@ -88,7 +79,7 @@
         <td>入口页面</td>
         <td>IP</td>
         <!-- <td>访问时长</td> -->
-        <td>访问页数</td>
+        <!-- <td>访问页数</td> -->
       </tr>
       </thead>
       <tbody>
@@ -99,7 +90,7 @@
         <td><a :href="record.url" target="_blank" :title="record.url">{{record.url}}</a></td>
         <td>{{record.ip}}</td>
         <!-- <td>{{record.duration}}</td> -->
-        <td>{{record.visitPages}}</td>
+        <!-- <td>{{record.visitPages}}</td> -->
       </tr>
       </tbody>
     </table>
@@ -185,7 +176,7 @@
                            label="描述文字"></el-input-number>
           <el-tooltip class="item" effect="dark" placement="right">
             <div slot="content">-设置流失标准-<br/><br/>你可以在此设置<br/>多少天未访问的<br/>用户为流失用户<br/>最小为7天<br/>最大为90天</div>
-            <el-button><i class="fa fa-question-circle"></i></el-button>
+            <el-button><i class="el-icon-question"></i></el-button>
           </el-tooltip>
         </div>
         <canvas id="svCanvas" width="200" height="100">
@@ -212,7 +203,7 @@ export default {
       statisticsToday: {},
       statisticsYesterday: {},
       statisticsChooseLoading: false,
-      statisticsChoose: {pv: '-', uv: '-', br: '-', ad: '-'},
+      statisticsChoose: {pv: '-', uv: '-',  ad: '-'},
       statisticsDate: null, // 选择的日期
       /* 比较折线图 */
       compareLoading: true,
@@ -234,7 +225,6 @@ export default {
       }],
       pvChart: null,
       uvChart: null,
-      brChart: null,
       adChart: null,
       compareLabel: ['前天', '昨天', '今天'],
       /* 实时访客记录 */
@@ -362,32 +352,6 @@ export default {
           }
         }
       })
-      this.brChart = new Chart(document.getElementById('brCanvas'), {
-        type: 'line',
-        data: {
-          labels: ['前天', '昨天', '今天'],
-          datasets: [{
-            data: [0, 0, 0],
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            borderColor: 'rgba(255,99,132,1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true, // 图表是否响应式
-          legend: { // 图例
-            display: false
-          },
-          scales: {
-            /* y轴 */
-            yAxes: [{
-              ticks: {
-                beginAtZero: true // 从0开始
-              }
-            }]
-          }
-        }
-      })
       this.adChart = new Chart(document.getElementById('adCanvas'), {
         type: 'line',
         data: {
@@ -458,7 +422,6 @@ export default {
     updateCanvas () {
       this.pvChart.update()
       this.uvChart.update()
-      this.brChart.update()
       this.adChart.update()
       this.novChart.update()
       this.svChart.update()
@@ -534,7 +497,6 @@ export default {
           this.compareLoading = false
           this.pvChart.data.datasets[0].data = res.compare.pvData
           this.uvChart.data.datasets[0].data = res.compare.uvData
-          this.brChart.data.datasets[0].data = res.compare.brData
           this.adChart.data.datasets[0].data = res.compare.adData
           this.updateCanvas()
         })
@@ -619,10 +581,10 @@ export default {
         if (dayNum >= 0) {
           this.getStatisticsChoose(dayNum)
         } else {
-          this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
+          this.statisticsChoose = {pv: '-', uv: '-', ad: '-'}
         }
       } else {
-        this.statisticsChoose = {pv: '-', uv: '-', br: '-', ad: '-'}
+        this.statisticsChoose = {pv: '-', uv: '-', ad: '-'}
       }
     },
     compareDate (val) {
@@ -633,7 +595,6 @@ export default {
         case '3': // 切换到近三天
           this.pvChart.data.labels = ['前天', '昨天', '今天']
           this.uvChart.data.labels = ['前天', '昨天', '今天']
-          this.brChart.data.labels = ['前天', '昨天', '今天']
           this.adChart.data.labels = ['前天', '昨天', '今天']
           this.getCompareData(3)
           break
@@ -644,7 +605,6 @@ export default {
           }
           this.pvChart.data.labels = tmp
           this.uvChart.data.labels = tmp
-          this.brChart.data.labels = tmp
           this.adChart.data.labels = tmp
           this.getCompareData(7)
           break
@@ -655,7 +615,6 @@ export default {
           }
           this.pvChart.data.labels = tmp
           this.uvChart.data.labels = tmp
-          this.brChart.data.labels = tmp
           this.adChart.data.labels = tmp
           this.getCompareData(15)
           break
@@ -666,7 +625,6 @@ export default {
           }
           this.pvChart.data.labels = tmp
           this.uvChart.data.labels = tmp
-          this.brChart.data.labels = tmp
           this.adChart.data.labels = tmp
           this.getCompareData(30)
           break
@@ -699,6 +657,7 @@ export default {
     this.getRecordsCount()
     this.getONVisitorData(1)
     this.getSVisitorData(30)
+    waTag('event', '分析页面', '访问', '访问分析页面')
   }
 }
 </script>

@@ -9,9 +9,6 @@
     <div class="input">
       <label for="pswIpt">密码</label>
       <input v-model.lazy="password" :type="type" id="pswIpt"/>
-      <i class="fa show-toggle"
-         :class="{'fa-eye':!toggleFlag,'fa-eye-slash':toggleFlag}"
-         @click="showToggle"></i>
       <span class="msg">{{pswMsg}}</span>
     </div>
     <div class="input">
@@ -85,8 +82,8 @@ export default {
       // 邮箱格式
       const reg = new RegExp('^[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\\w\\.-]*[a-zA-Z0-9]\\.[a-zA-Z][a-zA-Z\\.]*[a-zA-Z]$')
       if (val.length === 0) {
-        this.emlMsg = '邮箱不能为空'
-        return false
+        // this.emlMsg = '邮箱不能为空'
+        return true
       } else if (!reg.test(val)) {
         this.emlMsg = '邮箱格式不正确'
         return false
@@ -152,6 +149,7 @@ export default {
     }
   },
   mounted () {
+    waTag('conversion', '注册转化', '注册页', 2)
     this.$emit('routerTo', -1)
   }
 }
