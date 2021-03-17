@@ -238,26 +238,6 @@ export default {
     clear: both;
   }
 
-  /* elementUI全局样式修改 */
-  .el-loading-mask {
-    z-index: 9 !important;
-  }
-
-  .el-select {
-    z-index: 1 !important;
-  }
-
-  .el-select-dropdown {
-    z-index: 1 !important;
-  }
-
-  .el-picker-panel {
-    z-index: 1 !important;
-  }
-
-  .el-tabs__nav {
-    z-index: auto !important;
-  }
 
   /* App组件样式 */
   .header {
