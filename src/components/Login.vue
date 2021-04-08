@@ -20,8 +20,8 @@ export default{
   // 由于username和password是绑定在表单上的，所以得在computed上额外设置set方法，过于麻烦，所以这里不用store
   data () {
     return {
-      username: '',
-      password: '',
+      username: 'admin',
+      password: '123456',
       message: '',
       loading: false
     }
