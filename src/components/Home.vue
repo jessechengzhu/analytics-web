@@ -45,9 +45,9 @@
           <a href="http://www.ntu.edu.cn/" target="_blank" style="color: #40acdb;">南通大学</a>
           <a href="http://cs.ntu.edu.cn/" target="_blank" style="color: #40acdb;">信息科学技术学院（原计算机科学与技术学院）</a>
           <span style="color: #40acdb;">网络工程专业</span>
-          <a href="http://www.wzmxx.com/" target="_blank" style="color: #40acdb;">朱星杰</a>
+          <a href="https://zhu.xj.cn/" target="_blank" style="color: #40acdb;">朱星杰</a>
           同学的开发，指导老师：<span style="color: #40acdb;">陈森博</span>。</h3>
-        <h3 class="introduce">【更新】嘿嘿，我已经毕业啦，这玩意算是超低配版“百度统计”，但也能用，不过你可别真的靠我来统计你的网站啊喂~</h3>
+        <h3 class="introduce">【更新】嘿嘿，我已经毕业啦，当时这玩意算是超低配版“百度统计”，勉强能用。现在已将服务端全部下掉了，目前都是模拟数据哦~</h3>
         <h3 class="introduce">
           <router-link to="/login" style="color: darkred; font-weight: 600">开始吧</router-link>
         </h3>
