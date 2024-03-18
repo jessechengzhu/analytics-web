@@ -2,7 +2,7 @@ import axios from 'axios'
 import store from './index'
 import router from '../router'
 
-axios.defaults.baseURL = 'https://www.fastmock.site/mock/e07affb9bf3f41932bdaf67b1fe96f26/analytics'
+axios.defaults.baseURL = 'https://dev.usemock.com/65f7b4373d6a5fe053f4fbf3'
 
 // axios请求拦截器，每次请求前都带上token
 axios.interceptors.request.use(function (config) {
