@@ -21,7 +21,7 @@ Vue.use(Router)
 
 const router = new Router({
   mode: 'history',
-  base: 'analytics',
+  base: 'analytics-web',
   routes: [
     {
       path: '/',
